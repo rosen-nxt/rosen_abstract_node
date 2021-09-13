@@ -1,0 +1,18 @@
+<launch>
+    <arg name="testprefix" />
+    <arg name="node_namespace" />
+
+    <test test-name="$(arg testprefix)_statepublisher_rostest" pkg="rostest" type="hztest">
+        <param name="topic" value="$(arg node_namespace)/current_state" />
+        <param name="hz" value="1.0" />
+        <param name="hzerror" value="0.1" />
+        <param name="test_duration" value="10.0" />
+    </test>
+
+    <test test-name="$(arg testprefix)_looppublisher_rostest" pkg="rostest" type="hztest">
+        <param name="topic" value="$(arg node_namespace)/published_in_loop" />
+        <param name="hz" value="10.0" />
+        <param name="hzerror" value="0.1" />
+        <param name="test_duration" value="5.0" />
+    </test>
+</launch>

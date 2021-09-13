@@ -1,0 +1,11 @@
+<launch>
+    <arg name="testprefix" value="dummy_node" />
+    <arg name="node_name" value="test_dummy_node_name" />
+
+    <include file="$(find rosen_abstract_node)/rostest/diagnostics_rostest_tests.xml">
+        <arg name="testprefix" value="$(arg testprefix)" />
+        <arg name="full_qualified_node_name" value="/$(arg node_name)" />
+    </include>
+    
+    <node name="$(arg node_name)" pkg="rosen_abstract_node" type="dummy_node" />
+</launch>

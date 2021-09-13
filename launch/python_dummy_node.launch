@@ -1,0 +1,3 @@
+<launch>
+    <node name="python_dummy_node" pkg="rosen_abstract_node" type="python_dummy_node.py" output="screen" />
+</launch>

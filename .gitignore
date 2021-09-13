@@ -1,0 +1,7 @@
+# cache
+.cache
+__pycache__
+*.swp
+
+# python
+*.pyc

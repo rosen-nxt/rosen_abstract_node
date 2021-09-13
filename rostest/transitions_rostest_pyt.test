@@ -1,0 +1,11 @@
+<launch>
+    <include file="$(find rosen_abstract_node)/launch/abstract_node_transitions_rostest_tests.xml">
+        <arg name="package" value="rosen_abstract_node" />
+        <arg name="testprefix" value="python_dummy_node" />
+        <arg name="action_namespace" value="/test_python_dummy_node" />
+        <arg name="node_configurable" value="true" />
+        <arg name="configuration_namespace" value="/test_python_dummy_node" />
+    </include>
+    
+    <node name="test_python_dummy_node" pkg="rosen_abstract_node" type="python_dummy_node.py" />
+</launch>

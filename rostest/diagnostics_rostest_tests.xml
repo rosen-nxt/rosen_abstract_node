@@ -1,0 +1,17 @@
+<launch>
+    <arg name="testprefix" />
+    <arg name="full_qualified_node_name" />
+
+    <test test-name="$(arg testprefix)_diagnostics_frequency_test" pkg="rostest" type="hztest">
+        <param name="topic" value="/diagnostics" />
+        <param name="hz" value="1.0" />
+        <param name="hzerror" value="0.5" />
+        <param name="test_duration" value="10.0" />
+    </test>
+
+    <test test-name="$(arg testprefix)_diagnostic_messages_with_correct_hardware_id_published" pkg="rosen_abstract_node" type="diagnostics_rostest">
+        <param name="test_filter" value="diagnostic_messages_with_correct_hardware_id_published" />
+        <param name="full_qualified_node_name" value="$(arg full_qualified_node_name)" />
+    </test>
+
+</launch>

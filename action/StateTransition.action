@@ -1,0 +1,9 @@
+# goal
+uint8 transition
+---
+# result
+uint8 new_state
+---
+# feedback
+uint8 current_state
+uint8 transition
