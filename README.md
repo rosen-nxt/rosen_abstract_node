@@ -22,19 +22,19 @@ Stopped and node_configured are the only states relevant for the node itself. Th
 
 ![Final state machine model of the abstract node](doc/abstract_node_fsm.png)
 
-A transition can be initiated by using the provided action `~/state_transition_action` of type [state_transition.action](./action/state_transition.action).
+A transition can be initiated by using the provided action `~/state_transition_action` of type [StateTransition.action](./action/StateTransition.action).
 
-The parameter `transition` can be a value definied in [node_transition.msg](./msg/node_transition.msg). The action provides feedback to the caller with the transition passed and the `current_state` (before the transition) of the node (see [node_state.msg](./msg/node_state.msg)). The action can fail with the state `ABORTED` if the transition is not possible. Otherwise it runs until the transition `SUCCEEDED` and provides the `new_state` the node is in afterwards.
+The parameter `transition` can be a value definied in [NodeTransition.msg](./msg/NodeTransition.msg). The action provides feedback to the caller with the transition passed and the `current_state` (before the transition) of the node (see [NodeState.msg](./msg/NodeState.msg)). The action can fail with the state `ABORTED` if the transition is not possible. Otherwise it runs until the transition `SUCCEEDED` and provides the `new_state` the node is in afterwards.
 
 ### Current state
 
-The current state of each implementation of the abstract node is published with a rate of 1 Hz on topic `~/current_state` ([node_state_info.msg](./msg/node_state_info.msg)).
+The current state of each implementation of the abstract node is published with a rate of 1 Hz on topic `~/current_state` ([NodeStateInfo.msg](./msg/NodeStateInfo.msg)).
 
 ## Using and deriving from rosen_abstract_node
 
 ### Implementing your own node deriving from abstract node
 
-To implement a node, you have to derive from the `rosen_abstract_node` class ([C++](./include/rosen_abstract_node/rosen_abstract_node.h) / [Python](./src/rosen_abstract_node/rosen_abstract_node.py)). The `dummy_node` / `python_dummy_node` represents a (nearly) minimum working example fo this (see [header](./include/rosen_abstract_node/dummy_node.h) and [source](./src/dummy_node.cpp) (C++) or the [Python implementation](./scripts/python_dummy_node)) file in this repository).
+To implement a node, you have to derive from the `rosen_abstract_node` class ([C++](./include/rosen_abstract_node/rosen_abstract_node.h) / [Python](./src/rosen_abstract_node/rosen_abstract_node.py)). The `dummy_node` / `python_dummy_node` represents a (nearly) minimum working example fo this (see [header](./include/rosen_abstract_node/dummy_node.h) and [source](./src/dummy_node.cpp) (C++) or the [Python implementation](./scripts/python_dummy_node.py)) file in this repository).
 
 When implementing, you have to implement the following methods (Python API is similar):
 
