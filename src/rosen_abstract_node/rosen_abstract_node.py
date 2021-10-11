@@ -6,8 +6,8 @@ import diagnostic_updater
 import rospy
 
 from rosen_abstract_node.node_transition_helper import NodeTransitionHelper
-from rosen_abstract_node.state_machine import StateMachine
-from rosen_abstract_node.msg import NodeState, NodeStateInfo, NodeTransition, StateTransitionAction, StateTransitionFeedback, StateTransitionResult
+from rosen_abstract_node.abstract_node_sm import AbstractNodeSM
+from rosen_abstract_node.msg import NodeStateInfo, NodeTransition, StateTransitionAction, StateTransitionFeedback, StateTransitionResult
 
 class RosenAbstractNode(object):
     __metaclass__ = ABCMeta
@@ -28,31 +28,13 @@ class RosenAbstractNode(object):
         self.transition_processed = False
         self.transition_condition = Condition()
 
-        self.sm = StateMachine(NodeState.STOPPED)
-        self.sm.add_transition(NodeTransition.INIT,
-                              [NodeState.STOPPED],
-                              NodeState.NODE_CONFIGURED,
-                              self.do_init)
-        self.sm.add_transition(NodeTransition.CONNECT,
-                              [NodeState.NODE_CONFIGURED, NodeState.COMPONENT_DISCONNECTED],
-                              NodeState.COMPONENT_CONNECTED,
-                              self.do_connect)
-        self.sm.add_transition(NodeTransition.DISCONNECT,
-                              [NodeState.COMPONENT_PAUSED, NodeState.COMPONENT_RUNNING, NodeState.COMPONENT_CONNECTED],
-                              NodeState.COMPONENT_DISCONNECTED,
-                              self.do_disconnect)
-        self.sm.add_transition(NodeTransition.PAUSE,
-                               [NodeState.COMPONENT_RUNNING],
-                               NodeState.COMPONENT_PAUSED,
-                               self.do_pause)
-        self.sm.add_transition(NodeTransition.RESUME,
-                               [NodeState.COMPONENT_PAUSED],
-                               NodeState.COMPONENT_RUNNING,
-                               self.do_resume)
-        self.sm.add_transition(NodeTransition.STOP,
-                               [NodeState.NODE_CONFIGURED, NodeState.COMPONENT_DISCONNECTED],
-                               NodeState.STOPPED,
-                               self.do_stop)
+        self.sm = AbstractNodeSM(do_init=self.do_init,
+                                 do_connect=self.do_connect,
+                                 do_disconnect=self.do_disconnect,
+                                 do_start=self.do_start,
+                                 do_pause=self.do_pause,
+                                 do_resume=self.do_resume,
+                                 do_stop=self.do_stop)
 
         self.state_transition_action_server = actionlib.SimpleActionServer(
                                             "~state_transition_action",
@@ -77,7 +59,7 @@ class RosenAbstractNode(object):
             rospy.loginfo("rosen_abstract_node::sm_action_cb transition: {}".format(NodeTransitionHelper.to_string(trans)))
 
             state_transition_feedback = StateTransitionFeedback()
-            state_transition_feedback.current_state = self.sm.current_state
+            state_transition_feedback.current_state = self.sm.get_current_state()
             state_transition_feedback.transition = trans
             self.state_transition_action_server.publish_feedback(state_transition_feedback)
 
@@ -90,7 +72,7 @@ class RosenAbstractNode(object):
             self.transition_successful = False
 
         state_transition_result = StateTransitionResult()
-        state_transition_result.new_state = self.sm.current_state
+        state_transition_result.new_state = self.sm.get_current_state()
         if self.transition_successful:
             self.state_transition_action_server.set_succeeded(state_transition_result)
         else:
@@ -126,22 +108,16 @@ class RosenAbstractNode(object):
         with self.transition_condition:
             self.transition_successful = False
 
-            # The start transition is an edge case, because it can result in different states, running or paused,
-            # which depends on running parameter. So the start transition cannot be added to the state machine
-            # and has to be implemented outside of it.
-            if self.next_trans == NodeTransition.START:
-                self.transition_successful = self.sm_start()
-            else:
-                try:
-                    self.transition_successful = self.sm.do_transition(self.next_trans)
-                except KeyError:
-                    message = "rosen_abstract_node::do_transition: Received invalid transition. Please check at caller!"
-                    rospy.logfatal(message)
-                    raise TypeError(message)
+            try:
+                self.transition_successful = self.sm.do_transition(self.next_trans)
+            except KeyError:
+                message = "rosen_abstract_node::do_transition: Received invalid transition. Please check at caller!"
+                rospy.logfatal(message)
+                raise TypeError(message)
 
             sequence_count += 1
             state_info = NodeStateInfo()
-            state_info.current_state = self.sm.current_state
+            state_info.current_state = self.sm.get_current_state()
             state_info.header.seq = sequence_count
             state_info.header.stamp = rospy.Time.now()
             node_state_info_publisher.publish(state_info)
@@ -168,7 +144,7 @@ class RosenAbstractNode(object):
         int
             The current state the node is in (uv_msgs.msg.NodeState).
         """
-        return self.sm.current_state
+        return self.sm.get_current_state()
 
     def loop(self):
         """ The main, blocking loop of the node. Should be called after initialising the object.
@@ -194,7 +170,7 @@ class RosenAbstractNode(object):
             if status_freq_count > loop_frequency:
                 sequence_count += 1
                 state_info = NodeStateInfo()
-                state_info.current_state = self.sm.current_state
+                state_info.current_state = self.sm.get_current_state()
                 state_info.header.seq = sequence_count
                 state_info.header.stamp = rospy.Time.now()
                 node_state_info_publisher.publish(state_info)
@@ -214,26 +190,6 @@ class RosenAbstractNode(object):
             The frequency the node is configured to loop with
         """
         return self.loop_frequency
-
-    def sm_start(self):
-        """  Tries to set the node into state COMPONENT_RUNNING.
-
-        Returns
-        -------
-        Boolean
-            True if transition has been successful, else False.
-        """        
-        if self.sm.current_state == NodeState.COMPONENT_CONNECTED:
-            successful, running = self.do_start()
-            if successful:
-                if running:
-                    self.sm.current_state = NodeState.COMPONENT_RUNNING
-                else:
-                    self.sm.current_state = NodeState.COMPONENT_PAUSED                    
-
-                return True
-
-        return False
 
     def loop_once(self,sequence_count,node_state_info_publisher):
         """ Loops the statemachine once. This includes do_transition and do_step.
