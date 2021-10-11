@@ -84,8 +84,6 @@ namespace rosen_abstract_node
 
         private:
 
-            abstract_node_sm sm;
-
             /**
              * @brief Callback used when initiating a transition via the state_transition_action.
              * 
@@ -121,6 +119,8 @@ namespace rosen_abstract_node
             double loop_frequency;
 
         protected:
+
+            abstract_node_sm sm;
 
             /**
              * @brief Called when trying to set the node into state NODE_CONFIGURED.

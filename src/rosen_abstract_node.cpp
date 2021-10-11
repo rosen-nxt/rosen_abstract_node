@@ -24,19 +24,19 @@ namespace rosen_abstract_node
     rosen_abstract_node::rosen_abstract_node(const std::string& node_name,
                                              const std::shared_ptr<ros::NodeHandle>& ros_node_handle_private,
                                              const std::shared_ptr<diagnostic_updater::Updater>& ros_diagnostic_updater)
-    : sm(std::bind(&rosen_abstract_node::do_init, this),
+    : ros_node_name(node_name),
+      next_trans(NodeTransition::NONE),
+      state_transition_action_server(nullptr),
+      diag_updater(ros_diagnostic_updater),
+      wrapped_publishers(),
+      loop_frequency(DEFAULT_LOOP_FREQUENCY),
+      sm(std::bind(&rosen_abstract_node::do_init, this),
          std::bind(&rosen_abstract_node::do_connect, this),
          std::bind(&rosen_abstract_node::do_disconnect, this),
          std::bind(&rosen_abstract_node::do_start, this, std::placeholders::_1),
          std::bind(&rosen_abstract_node::do_pause, this),
          std::bind(&rosen_abstract_node::do_resume, this),
          std::bind(&rosen_abstract_node::do_stop, this)),
-      ros_node_name(node_name),
-      next_trans(NodeTransition::NONE),
-      state_transition_action_server(nullptr),
-      diag_updater(ros_diagnostic_updater),
-      wrapped_publishers(),
-      loop_frequency(DEFAULT_LOOP_FREQUENCY),
       node_handle_private(ros_node_handle_private)
     {
         if (ros_node_handle_private != nullptr)
