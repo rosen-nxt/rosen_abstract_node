@@ -24,7 +24,13 @@ namespace rosen_abstract_node
     rosen_abstract_node::rosen_abstract_node(const std::string& node_name,
                                              const std::shared_ptr<ros::NodeHandle>& ros_node_handle_private,
                                              const std::shared_ptr<diagnostic_updater::Updater>& ros_diagnostic_updater)
-    : sm(NodeState::STOPPED),
+    : sm(std::bind(&rosen_abstract_node::do_init, this),
+         std::bind(&rosen_abstract_node::do_connect, this),
+         std::bind(&rosen_abstract_node::do_disconnect, this),
+         std::bind(&rosen_abstract_node::do_start, this, std::placeholders::_1),
+         std::bind(&rosen_abstract_node::do_pause, this),
+         std::bind(&rosen_abstract_node::do_resume, this),
+         std::bind(&rosen_abstract_node::do_stop, this)),
       ros_node_name(node_name),
       next_trans(NodeTransition::NONE),
       state_transition_action_server(nullptr),
@@ -33,31 +39,6 @@ namespace rosen_abstract_node
       loop_frequency(DEFAULT_LOOP_FREQUENCY),
       node_handle_private(ros_node_handle_private)
     {
-        sm.add_transition(NodeTransition::INIT,
-                          {NodeState::STOPPED},
-                          NodeState::NODE_CONFIGURED,
-                          std::bind(&rosen_abstract_node::do_init, this));
-        sm.add_transition(NodeTransition::CONNECT,
-                          {NodeState::NODE_CONFIGURED, NodeState::COMPONENT_DISCONNECTED},
-                          NodeState::COMPONENT_CONNECTED,
-                          std::bind(&rosen_abstract_node::do_connect, this));
-        sm.add_transition(NodeTransition::DISCONNECT,
-                          {NodeState::COMPONENT_PAUSED, NodeState::COMPONENT_RUNNING, NodeState::COMPONENT_CONNECTED},
-                          NodeState::COMPONENT_DISCONNECTED,
-                          std::bind(&rosen_abstract_node::do_disconnect, this));
-        sm.add_transition(NodeTransition::PAUSE,
-                          {NodeState::COMPONENT_RUNNING},
-                          NodeState::COMPONENT_PAUSED,
-                          std::bind(&rosen_abstract_node::do_pause, this));
-        sm.add_transition(NodeTransition::RESUME,
-                          {NodeState::COMPONENT_PAUSED},
-                          NodeState::COMPONENT_RUNNING,
-                          std::bind(&rosen_abstract_node::do_resume, this));
-        sm.add_transition(NodeTransition::STOP,
-                          {NodeState::NODE_CONFIGURED, NodeState::COMPONENT_DISCONNECTED},
-                          NodeState::STOPPED,
-                          std::bind(&rosen_abstract_node::do_stop, this));
-
         if (ros_node_handle_private != nullptr)
         {
             state_transition_action_server = std::make_shared<actionlib::SimpleActionServer<StateTransitionAction>>(
@@ -126,26 +107,17 @@ namespace rosen_abstract_node
             std::lock_guard<std::mutex> lock(transition_mutex);
             transition_successful = false;
 
-            // The start transition is an edge case, because it can result in different states, running or paused,
-            // which depends on running parameter. So the start transition cannot be added to the state machine
-            // and has to be implemented outside of it.
-            if (next_trans == NodeTransition::START)
+            try
             {
-                transition_successful = sm_start();
+                transition_successful = sm.do_transition(next_trans);
             }
-            else
+            catch (const std::out_of_range&)
             {
-                try
-                {
-                    transition_successful = sm.do_transition(next_trans);
-                }
-                catch (const std::out_of_range&)
-                {
-                    const auto message = "abstract_node::do_transition: Received invalid transition. Please check at caller!";
-                    ROS_FATAL(message);
-                    throw std::logic_error(message);
-                }
+                const auto message = "abstract_node::do_transition: Received invalid transition. Please check at caller!";
+                ROS_FATAL(message);
+                throw std::logic_error(message);
             }
+
             if (nullptr != current_state_publisher)
             {
                 NodeStateInfo node_state_info;
@@ -227,20 +199,6 @@ namespace rosen_abstract_node
     double rosen_abstract_node::get_loop_frequency()
     {
         return loop_frequency;
-    }
-
-    bool rosen_abstract_node::sm_start()
-    {
-        if (sm.get_current_state() == NodeState::COMPONENT_CONNECTED)
-        {
-            bool running = false;
-            if (do_start(running))
-            {
-                sm.set_current_state(running ?    NodeState::COMPONENT_RUNNING : NodeState::COMPONENT_PAUSED);
-                return true;
-            }
-        }
-        return false;
     }
 
 }

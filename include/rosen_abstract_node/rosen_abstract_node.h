@@ -14,7 +14,7 @@
 #include "rosen_abstract_node/node_state_helper.h"
 #include "rosen_abstract_node/NodeStateInfo.h"
 #include "rosen_abstract_node/StateTransitionAction.h"
-#include "rosen_abstract_node/state_machine.h"
+#include "rosen_abstract_node/abstract_node_sm.h"
 
 /**
  *
@@ -84,14 +84,7 @@ namespace rosen_abstract_node
 
         private:
 
-            state_machine sm;
-
-            /**
-             * @brief Tries to set the node into state COMPONENT_RUNNING.
-             * 
-             * @return True if transition has been successful, else false.
-             */
-            bool sm_start();
+            abstract_node_sm sm;
 
             /**
              * @brief Callback used when initiating a transition via the state_transition_action.

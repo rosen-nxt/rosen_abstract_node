@@ -94,7 +94,8 @@ catkin_install_python(PROGRAMS scripts/python_dummy_node.py
 
 add_library(rosen_abstract_node
     src/rosen_abstract_node.cpp
-    src/state_machine.cpp)
+    src/state_machine.cpp
+    src/abstract_node_sm.cpp)
 
 add_dependencies(rosen_abstract_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rosen_abstract_node ${catkin_LIBRARIES} ${LIBRARY_CONFIGURATION_LINK_THIRDPARTIES} ${ROCAT_PACKAGE_NON_CATKIN_THIRDPARTIES})
