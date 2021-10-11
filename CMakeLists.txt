@@ -95,21 +95,11 @@ catkin_install_python(PROGRAMS scripts/python_dummy_node.py
 add_library(rosen_abstract_node
     src/rosen_abstract_node.cpp
     src/state_machine.cpp
-    src/abstract_node_sm.cpp)
+    src/abstract_node_sm.cpp
+    src/test_utils.cpp)
 
 add_dependencies(rosen_abstract_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rosen_abstract_node ${catkin_LIBRARIES} ${LIBRARY_CONFIGURATION_LINK_THIRDPARTIES} ${ROCAT_PACKAGE_NON_CATKIN_THIRDPARTIES})
-
-###################################################################
-## Add the test_utils library as target and link it to libraries ##
-###################################################################
-
-add_library(test_utils
-    src/test_utils.cpp)
-
-add_dependencies(test_utils ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(test_utils ${catkin_LIBRARIES} ${LIBRARY_CONFIGURATION_LINK_THIRDPARTIES} ${ROCAT_PACKAGE_NON_CATKIN_THIRDPARTIES})
-
 
 ######################################################################
 ## Add the dummy_node executable as target and link it to libraries ##
@@ -129,7 +119,7 @@ add_executable(execute_transitions
     src/execute_transitions.cpp
 )
 add_dependencies(execute_transitions ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(execute_transitions ${catkin_LIBRARIES} test_utils)
+target_link_libraries(execute_transitions ${catkin_LIBRARIES} rosen_abstract_node)
 
 ##############################################################################
 ## Add the manual_action_test executable as target and link it to libraries ##
@@ -152,7 +142,7 @@ install(FILES ${ROCAT_CPP_HEADERS} DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINAT
 ## Install generated targets ##
 ###############################
 
-install(TARGETS rosen_abstract_node dummy_node manual_action_test
+install(TARGETS rosen_abstract_node dummy_node manual_action_test execute_transitions
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
