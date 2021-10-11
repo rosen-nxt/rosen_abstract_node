@@ -1,0 +1,22 @@
+<launch>
+    <!--
+    Use this launchfile to set your abstract_node implementation to running, e.g. in rostests.
+    This should NEVER be used in the real system and should ONLY be used for automated or manual testing purposes.
+    In a real system, this would be done by a node_manager or device_manager.
+
+    Use it like this:
+    <include file="$(find rosen_abstract_node)/launch/set_node_to_running.launch">
+        <arg name="namespace" value="/namespace/of/your/node" />
+        <arg name="retry_first_transition" value="<true/false>" />
+    </include>
+    -->
+
+    <arg name="namespace" default="/namespace/node_name" />
+    <arg name="retry_first_transition" default="false" />
+
+    <node name="do_transitions" pkg="rosen_abstract_node" type="execute_transitions" output="screen">    
+        <param name="namespace" value="$(arg namespace)" />
+        <param name="transitions" value="1 2 4" /> <!-- INIT CONNECT START -->
+        <param name="retry_first_transition" value="$(arg retry_first_transition)" />
+    </node>
+</launch>

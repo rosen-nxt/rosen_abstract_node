@@ -84,6 +84,22 @@ if __name__ == "__main__":
 
 **Please make sure that the constructor of your derived class calls one of the constructors of the `rosen_abstract_node` class!**
 
+### Change the node state of your derived node
+
+The node state is meant to be changed by other nodes. However, for testing purposes it makes sense, to be able to change the node state interactively. This is done with the manual_action_test.
+You can either add the full node name as an argument (e.g. "/dummy_node") or you can pick the node interactively with the "-a" flag.
+```bash
+rosrun rosen_abstract_node manual_action_test <full_node_name>
+# or
+rosrun rosen_abstract_node manual_action_test -a
+```
+
+If you want to change the node state automatically, e.g. if you have a rostest, just run the set_node_to_running launch file:
+
+```bash
+roslaunch rosen_abstract_node set_node_to_running.launch namespace:=<full_node_name>
+```
+
 ## Running tests
 
 Ensure having built the project so the `dummy_node` has been built for rostest:

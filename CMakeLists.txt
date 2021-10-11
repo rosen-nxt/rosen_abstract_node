@@ -100,6 +100,17 @@ add_library(rosen_abstract_node
 add_dependencies(rosen_abstract_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rosen_abstract_node ${catkin_LIBRARIES} ${LIBRARY_CONFIGURATION_LINK_THIRDPARTIES} ${ROCAT_PACKAGE_NON_CATKIN_THIRDPARTIES})
 
+###################################################################
+## Add the test_utils library as target and link it to libraries ##
+###################################################################
+
+add_library(test_utils
+    src/test_utils.cpp)
+
+add_dependencies(test_utils ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(test_utils ${catkin_LIBRARIES} ${LIBRARY_CONFIGURATION_LINK_THIRDPARTIES} ${ROCAT_PACKAGE_NON_CATKIN_THIRDPARTIES})
+
+
 ######################################################################
 ## Add the dummy_node executable as target and link it to libraries ##
 ######################################################################
@@ -109,6 +120,16 @@ add_executable(dummy_node
 )
 add_dependencies(dummy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(dummy_node ${catkin_LIBRARIES} rosen_abstract_node)
+
+###############################################################################
+## Add the execute_transitions executable as target and link it to libraries ##
+###############################################################################
+
+add_executable(execute_transitions
+    src/execute_transitions.cpp
+)
+add_dependencies(execute_transitions ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(execute_transitions ${catkin_LIBRARIES} test_utils)
 
 ##############################################################################
 ## Add the manual_action_test executable as target and link it to libraries ##
