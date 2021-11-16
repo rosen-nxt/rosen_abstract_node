@@ -6,11 +6,6 @@
     <arg name="configuration_namespace" default="none" />
 
     <!-- NodeState::STOPPED -->
-
-    <test test-name="$(arg testprefix)_goal_state_aborted_after_invalid_transition" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="goal_state_aborted_after_invalid_transition" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
     
     <test test-name="$(arg testprefix)_goal_state_aborted_after_unknown_transition" pkg="$(arg package)" type="transitions_rostest">
         <param name="test_filter" value="goal_state_aborted_after_unknown_transition" />
@@ -22,65 +17,10 @@
         <param name="action_namespace" value="$(arg action_namespace)" />
     </test>
 
-    <test test-name="$(arg testprefix)_node_stopped_connect_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_stopped_connect_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_stopped_disconnect_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_stopped_disconnect_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_stopped_start_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_stopped_start_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_stopped_pause_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_stopped_pause_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_stopped_resume_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_stopped_resume_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_stopped_stop_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_stopped_stop_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-
     <!-- NodeState::NODE_CONFIGURED -->
-    
-    <test test-name="$(arg testprefix)_node_configured_init_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_configured_init_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
     
     <test test-name="$(arg testprefix)_node_configured_connect_valid_success" pkg="$(arg package)" type="transitions_rostest">
         <param name="test_filter" value="node_configured_connect_valid_success" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_configured_disconnect_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_configured_disconnect_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_configured_start_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_configured_start_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_configured_pause_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_configured_pause_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_configured_resume_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_configured_resume_invalid" />
         <param name="action_namespace" value="$(arg action_namespace)" />
     </test>
     
@@ -90,16 +30,6 @@
     </test>
 
     <!-- NodeState::COMPONENT_CONNECTED -->
-    
-    <test test-name="$(arg testprefix)_node_connected_init_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_connected_init_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_connected_connect_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_connected_connect_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
     
     <test test-name="$(arg testprefix)_node_connected_disconnect_valid_success" pkg="$(arg package)" type="transitions_rostest">
         <param name="test_filter" value="node_connected_disconnect_valid_success" />
@@ -111,50 +41,10 @@
         <param name="action_namespace" value="$(arg action_namespace)" />
     </test>
     
-    <test test-name="$(arg testprefix)_node_connected_pause_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_connected_pause_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_connected_resume_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_connected_resume_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_connected_stop_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_connected_stop_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
     <!-- NodeState::COMPONENT_DISCONNECTED -->
-
-    <test test-name="$(arg testprefix)_node_disconnected_init_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_disconnected_init_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
     
     <test test-name="$(arg testprefix)_node_disconnected_connect_valid_success" pkg="$(arg package)" type="transitions_rostest">
         <param name="test_filter" value="node_disconnected_connect_valid_success" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_disconnected_disconnect_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_disconnected_disconnect_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_disconnected_start_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_disconnected_start_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_disconnected_pause_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_disconnected_pause_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_disconnected_resume_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_disconnected_resume_invalid" />
         <param name="action_namespace" value="$(arg action_namespace)" />
     </test>
     
@@ -164,39 +54,14 @@
     </test>
     
     <!-- NodeState::COMPONENT_RUNNING -->
-
-    <test test-name="$(arg testprefix)_node_running_init_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_running_init_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_running_connect_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_running_connect_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
     
     <test test-name="$(arg testprefix)_node_running_disconnect_valid_success" pkg="$(arg package)" type="transitions_rostest">
         <param name="test_filter" value="node_running_disconnect_valid_success" />
         <param name="action_namespace" value="$(arg action_namespace)" />
     </test>
     
-    <test test-name="$(arg testprefix)_node_running_start_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_running_start_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
     <test test-name="$(arg testprefix)_node_running_pause_valid_success" pkg="$(arg package)" type="transitions_rostest">
         <param name="test_filter" value="node_running_pause_valid_success" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_running_resume_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_running_resume_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_running_stop_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_running_stop_invalid" />
         <param name="action_namespace" value="$(arg action_namespace)" />
     </test>
 
@@ -207,38 +72,13 @@
 
     <!-- NodeState::COMPONENT_PAUSED -->
     
-    <test test-name="$(arg testprefix)_node_paused_init_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_paused_init_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_paused_connect_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_paused_connect_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
     <test test-name="$(arg testprefix)_node_paused_disconnect_valid_success" pkg="$(arg package)" type="transitions_rostest">
         <param name="test_filter" value="node_paused_disconnect_valid_success" />
         <param name="action_namespace" value="$(arg action_namespace)" />
     </test>
     
-    <test test-name="$(arg testprefix)_node_paused_start_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_paused_start_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_paused_pause_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_paused_pause_invalid" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
     <test test-name="$(arg testprefix)_node_paused_resume_valid_success" pkg="$(arg package)" type="transitions_rostest">
         <param name="test_filter" value="node_paused_resume_valid_success" />
-        <param name="action_namespace" value="$(arg action_namespace)" />
-    </test>
-    
-    <test test-name="$(arg testprefix)_node_paused_stop_invalid" pkg="$(arg package)" type="transitions_rostest">
-        <param name="test_filter" value="node_paused_stop_invalid" />
         <param name="action_namespace" value="$(arg action_namespace)" />
     </test>
 
