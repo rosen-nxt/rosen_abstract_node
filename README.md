@@ -3,7 +3,7 @@
 ## How it works and what it is for
 
 To unify the design of ROS nodes (with a special focus on nodes interfacing with hardware devices)
-and to allow for state switching and monitoring of all ROS nodes, this base class called `rosen_abstract_node` has been designed.
+and to allow for state switching and monitoring of all ROS nodes, this base class called `RosenAbstractNode` has been designed.
 
 It provides a state machine along with a ROS action interface to enable (external) state change requests.
 
@@ -34,26 +34,26 @@ The current state of each implementation of the abstract node is published with 
 
 ### Implementing your own node deriving from abstract node
 
-To implement a node, you have to derive from the `rosen_abstract_node` class ([C++](./include/rosen_abstract_node/rosen_abstract_node.h) / [Python](./src/rosen_abstract_node/rosen_abstract_node.py)). The `dummy_node` / `python_dummy_node` represents a (nearly) minimum working example fo this (see [header](./include/rosen_abstract_node/dummy_node.h) and [source](./src/dummy_node.cpp) (C++) or the [Python implementation](./scripts/python_dummy_node.py)) file in this repository).
+To implement a node, you have to derive from the `RosenAbstractNode` class ([C++](./include/rosen_abstract_node/RosenAbstractNode.h) / [Python](./src/rosen_abstract_node/rosen_abstract_node.py)). The `dummy_node` / `python_dummy_node` represents a (nearly) minimum working example fo this (see [header](./include/rosen_abstract_node/DummyNode.h) and [source](./src/DummyNode.cpp) (C++) or the [Python implementation](./scripts/python_dummy_node.py)) file in this repository).
 
 When implementing, you have to implement the following methods (Python API is similar):
 
 ```C++
-bool do_init() override;
-bool do_stop() override;
-bool do_connect() override;
-bool do_disconnect() override;
-bool do_pause() override;
-bool do_start(bool& running) override;
-bool do_resume() override;
+bool doInit() override;
+bool doStop() override;
+bool doConnect() override;
+bool doDisconnect() override;
+bool doPause() override;
+bool doStart(bool& running) override;
+bool doResume() override;
 ```
 
 All methods are called by the state machine when doing the according transitions. By setting the boolean return values you can indicate whether the transition was successful or not. The state machine then sets the according states automatically.
 
-The method `do_step()` (shown below) is called on every loop of the state machine. Implement this method to define the behaviour of your node when it is in a particular state - especially when it is in state `running`.
+The method `doStep()` (shown below) is called on every loop of the state machine. Implement this method to define the behaviour of your node when it is in a particular state - especially when it is in state `running`.
 
 ```C++
-void do_step() override;
+void doStep() override;
 ```
 
 ### Starting your derived node - the `main`-method
@@ -64,7 +64,7 @@ To start your node, you just have to instantiate your node class and call the `l
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "my_node_name");
-  my_node_namespace::my_node_class node;
+  my_node_namespace::MyNodeClass node;
   node.loop();
   return EXIT_SUCCESS;
 }
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     main()
 ```
 
-**Please make sure that the constructor of your derived class calls one of the constructors of the `rosen_abstract_node` class!**
+**Please make sure that the constructor of your derived class calls one of the constructors of the `RosenAbstractNode` class!**
 
 ### Change the node state of your derived node
 
@@ -102,7 +102,7 @@ roslaunch rosen_abstract_node set_node_to_running.launch namespace:=<full_node_n
 
 ## Running tests
 
-Ensure having built the project so the `dummy_node` has been built for rostest:
+Ensure having built the project so the `DummyNode` has been built for rostest:
 
 ```bash
 catkin build rosen_abstract_node

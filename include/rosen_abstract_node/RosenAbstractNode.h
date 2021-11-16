@@ -10,11 +10,11 @@
 #include <diagnostic_updater/diagnostic_updater.h>
 #include <diagnostic_updater/publisher.h>
 
-#include "rosen_abstract_node/node_transition_helper.h"
-#include "rosen_abstract_node/node_state_helper.h"
+#include "rosen_abstract_node/NodeTransitionHelper.h"
+#include "rosen_abstract_node/NodeStateHelper.h"
 #include "rosen_abstract_node/NodeStateInfo.h"
 #include "rosen_abstract_node/StateTransitionAction.h"
-#include "rosen_abstract_node/abstract_node_sm.h"
+#include "rosen_abstract_node/AbstractNodeSm.h"
 
 /**
  *
@@ -30,7 +30,7 @@
 
 namespace rosen_abstract_node
 {
-    class rosen_abstract_node
+    class RosenAbstractNode
     {
         public:
 
@@ -41,22 +41,22 @@ namespace rosen_abstract_node
              *               control this node in a certain way. The concrete definition of these parameters
              *               is not part of the abstract_node.
              */
-            explicit rosen_abstract_node(const unsigned char flags);
+            explicit RosenAbstractNode(const unsigned char flags);
 
             /**
              * @brief Initialises the abstract node with all required ROS components with the
              *        given node name in the given namespaces.
              *        Use this constructor if you want a default initialisation of all required ROS components.
              * 
-             * @param node_name       The name of the ROS node.
-             * @param node_namespace  The private namespace of the ROS node.
+             * @param nodeName        The name of the ROS node.
+             * @param nodeNamespace   The private namespace of the ROS node.
              * @param flags           Additional node control parameter. They can be used by other nodes to
              *                        control this node in a certain way. The concrete definition of these parameters
              *                        is not part of the abstract_node.
              */
-            explicit rosen_abstract_node(const std::string& node_name = ros::this_node::getName(),
-                                         const std::string& node_namespace = "~",
-                                         const unsigned char flags = 0);
+            explicit RosenAbstractNode(const std::string& nodeName = ros::this_node::getName(),
+                                       const std::string& nodeNamespace = "~",
+                                       const unsigned char flags = 0);
 
             /**
              * @brief Initialises the abstract node with the passed node_handle and diagnostics
@@ -64,19 +64,19 @@ namespace rosen_abstract_node
              *        Use this constructor if you created the ROS components externally or want to use it
              *        without ROS core running.
              * 
-             * @param node_name               The name of the ROS node.
-             * @param ros_node_handle_private The private node handle to be used.
-             * @param ros_diagnostic_updater  The diagnostic updater to be used for diagnostic purposes.
+             * @param nodeName               The name of the ROS node.
+             * @param rosNodeHandlePrivate   The private node handle to be used.
+             * @param rosDiagnosticUpdater   The diagnostic updater to be used for diagnostic purposes.
              * @param flags                   Additional node control parameter. They can be used by other nodes to
              *                                control this node in a certain way. The concrete definition of these
              *                                parameters is not part of the abstract_node.
              */
-            rosen_abstract_node(const std::string& node_name,
-                                const std::shared_ptr<ros::NodeHandle>& ros_node_handle_private,
-                                const std::shared_ptr<diagnostic_updater::Updater>& ros_diagnostic_updater,
-                                const unsigned char flags = 0);
+            RosenAbstractNode(const std::string& nodeName,
+                              const std::shared_ptr<ros::NodeHandle>& rosNodeHandlePrivate,
+                              const std::shared_ptr<diagnostic_updater::Updater>& rosDiagnosticUpdater,
+                              const unsigned char flags = 0);
 
-            virtual ~rosen_abstract_node() = default;
+            virtual ~RosenAbstractNode() = default;
 
             /**
              * @brief The main, blocking loop of the node. Should be called after initialising the object.
@@ -91,7 +91,7 @@ namespace rosen_abstract_node
              * 
              * @param transition The transition to be executed.
              */
-            void initiate_transition(node_transition_no transition);
+            void initiateTransition(NodeTransitionNo transition);
 
             /**
              * @brief Initiate the given transition to be executed by the node in the next loop.
@@ -100,21 +100,21 @@ namespace rosen_abstract_node
              *
              * @param transition The transition to be executed.
              */
-            void initiate_transition(unsigned char transition);
+            void initiateTransition(unsigned char transition);
 
             /**
              * @brief Gets the current state the node is in.
              * 
              * @return The current state the node is in.
              */
-            unsigned int get_current_state() const;
+            unsigned int getCurrentState() const;
 
             /**
              * @brief Returns the configured flags.
              *
              * @return The flags.
              */
-            unsigned char get_flags() const;
+            unsigned char getFlags() const;
 
         private:
 
@@ -125,45 +125,45 @@ namespace rosen_abstract_node
              * 
              * @param goal The goal of the transition.
              */
-            void sm_action_cb(const StateTransitionGoalConstPtr& goal);
+            void smActionCb(const StateTransitionGoalConstPtr& goal);
 
-            const std::string ros_node_name;
+            const std::string rosNodeName;
 
-            node_transition_no next_trans;
+            NodeTransitionNo nextTrans;
 
-            bool transition_processed = false;
-            bool transition_successful = false;
-            std::mutex transition_mutex;
-            std::condition_variable transition_condition_variable;
+            bool transitionProcessed = false;
+            bool transitionSuccessful = false;
+            std::mutex transitionMutex;
+            std::condition_variable transitionConditionVariable;
 
-            std::shared_ptr<actionlib::SimpleActionServer<StateTransitionAction>> state_transition_action_server;
+            std::shared_ptr<actionlib::SimpleActionServer<StateTransitionAction>> stateTransitionActionServer;
 
             /**
-             * @brief Update the node_state_info and publish it via ROS.
+             * @brief Update the nodeStateInfo and publish it via ROS.
              *
-             * @param current_state_publisher The publisher of the current state.
-             * @param now The current time.
-             * @param node_state_info This is the node state, which will updated and published.
+             * @param currentStatePublisher The publisher of the current state.
+             * @param now                   The current time.
+             * @param nodeStateInfo         This is the node state, which will updated and published.
              */
-            void update_and_publish_node_state_info(const ros::Publisher& current_state_publisher, const ros::Time now, NodeStateInfo& node_state_info);
+            void updateAndPublishNodeStateInfo(const ros::Publisher& currentStatePublisher, const ros::Time now, NodeStateInfo& nodeStateInfo);
 
-            std::shared_ptr<diagnostic_updater::Updater> diag_updater;
-            std::shared_ptr<diagnostic_updater::FrequencyStatus> create_frequency_status();
+            std::shared_ptr<diagnostic_updater::Updater> diagUpdater;
+            std::shared_ptr<diagnostic_updater::FrequencyStatus> createFrequencyStatus();
 
-            std::vector<ros::Publisher> wrapped_publishers;
+            std::vector<ros::Publisher> wrappedPublishers;
 
-            std::shared_ptr<ros::Publisher> flags_publisher;
+            std::shared_ptr<ros::Publisher> flagsPublisher;
 
-            double loop_frequency;
+            double loopFrequency;
 
             /**
              * @brief Publish the flags as ROS message.
              */
-            void publish_flags() const;
+            void publishFlags() const;
 
         protected:
 
-            abstract_node_sm sm;
+            AbstractNodeSm sm;
 
             /**
              * @brief Called when trying to set the node into state NODE_CONFIGURED.
@@ -172,7 +172,7 @@ namespace rosen_abstract_node
              * 
              * @return True if transition is possible, else false.
              */
-            virtual bool do_init() = 0;
+            virtual bool doInit() = 0;
 
             /**
              * @brief Called when trying to set the node into state STOPPED.
@@ -181,7 +181,7 @@ namespace rosen_abstract_node
              * 
              * @return True if transition is possible, else false.
              */
-            virtual bool do_stop() = 0;
+            virtual bool doStop() = 0;
 
             /**
              * @brief Called when trying to set the node into state COMPONENT_CONNECTED.
@@ -190,7 +190,7 @@ namespace rosen_abstract_node
              * 
              * @return True if transition is possible, else false.
              */
-            virtual bool do_connect() = 0;
+            virtual bool doConnect() = 0;
 
             /**
              * @brief Called when trying to set the node into state COMPONENT_DISCONNECTED.
@@ -199,7 +199,7 @@ namespace rosen_abstract_node
              * 
              * @return True if transition is possible, else false.
              */
-            virtual bool do_disconnect() = 0;
+            virtual bool doDisconnect() = 0;
 
             /**
              * @brief Called when trying to set the node into state COMPONENT_PAUSED.
@@ -208,7 +208,7 @@ namespace rosen_abstract_node
              * 
              * @return True if transition is possible, else false.
              */
-            virtual bool do_pause() = 0;
+            virtual bool doPause() = 0;
 
             /**
              * @brief Called when trying to set the node into state COMPONENT_RUNNING (from COMPONENT_PAUSED).
@@ -217,7 +217,7 @@ namespace rosen_abstract_node
              * 
              * @return True if transition is possible, else false.
              */
-            virtual bool do_resume() = 0;
+            virtual bool doResume() = 0;
 
             /**
              * @brief Called when trying to set the node into state COMPONENT_RUNNING or COMPONENT_PAUSED (from COMPONENT_CONNECTED).
@@ -228,24 +228,24 @@ namespace rosen_abstract_node
              * 
              * @return True if transition is possible, else false.
              */
-            virtual bool do_start(bool& running) = 0;
+            virtual bool doStart(bool& running) = 0;
 
             /**
              * @brief Override this method if your code needs to be called periodically (e.g. to publish status messages).
              *        This method will be called in the node's main loop independent of the
              *        node's state. The default frequency is 10 Hz.
              */
-            virtual void do_step() = 0;
+            virtual void doStep() = 0;
             
             /**
              * @brief Executes the desired transition, if possible.
              *        If no transition is set, nothing happens.
              * 
-             * @param current_state_publisher If this is not a nullpointer, the new current state will be published by the current_state_publisher
+             * @param currentStatePublisher If this is not a nullpointer, the new current state will be published by the currentStatePublisher
              */
-            void do_transition(const std::unique_ptr<ros::Publisher>& current_state_publisher);
+            void doTransition(const std::unique_ptr<ros::Publisher>& currentStatePublisher);
 
-            std::shared_ptr<ros::NodeHandle> node_handle_private;
+            std::shared_ptr<ros::NodeHandle> nodeHandlePrivate;
 
             /**
              * @brief Get a reference to the diagnostic_updater.
@@ -255,41 +255,41 @@ namespace rosen_abstract_node
              * 
              * @return Reference to a diagnostic_updater::Updater object
              */
-            std::shared_ptr<diagnostic_updater::Updater> get_diagnostic_updater();
+            std::shared_ptr<diagnostic_updater::Updater> getDiagnosticUpdater();
 
 
             /**
              * @brief Gets the frequency the node is configured to loop with.
-             *        It defines with which frequency the node performs transitions and calls do_step().
-             *        Is configurable by the ROS parameter ~/loop_frequency.
+             *        It defines with which frequency the node performs transitions and calls doStep().
+             *        Is configurable by the ROS parameter ~/loopFrequency.
              * 
              * @return The frequency the node is configured to loop with.
              */
-            double get_loop_frequency();
+            double getLoopFrequency();
 
             /**
              * @brief Create a diagnosed publisher that is inspected by ros diagnositcs for the specified arguments.
-             *        Only returns the diagnosed publisher. Stores the wrapped publisher in the internal container wrapped_publishers.
+             *        Only returns the diagnosed publisher. Stores the wrapped publisher in the internal container wrappedPublishers.
              * 
              * @param topic            The topic the diagnosed publisher should be created for.
-             * @param queue_size       The queue size used for the publisher.
+             * @param queueSize        The queue size used for the publisher.
              * @param latch            Indicates whether the topic should be latched or not.
-             * @param freq_status      A reference to the expected frequency configuration of the publisher.
-             * @param timestamp_status A reference to the expected time stamp configuration of the publisher.
+             * @param freqStatus       A reference to the expected frequency configuration of the publisher.
+             * @param timestampStatus  A reference to the expected time stamp configuration of the publisher.
              * 
              * @return A diagnosed publisher configured with the specified arguments.
              */
             template<class T>
-            std::shared_ptr<diagnostic_updater::DiagnosedPublisher<T>> create_diagnosed_publisher(
+            std::shared_ptr<diagnostic_updater::DiagnosedPublisher<T>> createDiagnosedPublisher(
                 const std::string& topic,
-                uint32_t queue_size,
+                uint32_t queueSize,
                 bool latch,
-                const diagnostic_updater::FrequencyStatusParam& freq_status,
-                const diagnostic_updater::TimeStampStatusParam& timestamp_status)
+                const diagnostic_updater::FrequencyStatusParam& freqStatus,
+                const diagnostic_updater::TimeStampStatusParam& timestampStatus)
             {
-                auto wrapped_publisher = node_handle_private->advertise<T>(topic, queue_size, latch);
-                wrapped_publishers.push_back(wrapped_publisher);
-                return std::make_shared<diagnostic_updater::DiagnosedPublisher<T>>(wrapped_publisher, *diag_updater, freq_status, timestamp_status);
+                auto wrappedPublisher = nodeHandlePrivate->advertise<T>(topic, queueSize, latch);
+                wrappedPublishers.push_back(wrappedPublisher);
+                return std::make_shared<diagnostic_updater::DiagnosedPublisher<T>>(wrappedPublisher, *diagUpdater, freqStatus, timestampStatus);
             }
 
             /**
@@ -297,7 +297,7 @@ namespace rosen_abstract_node
              * 
              * @return True if transition was successful, else false.
              */
-            bool get_transition_successful() const;
+            bool getTransitionSuccessful() const;
 
     };
 }

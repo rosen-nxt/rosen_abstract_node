@@ -93,10 +93,10 @@ catkin_install_python(PROGRAMS scripts/python_dummy_node.py
 ############################################################################
 
 add_library(rosen_abstract_node
-    src/rosen_abstract_node.cpp
-    src/state_machine.cpp
-    src/abstract_node_sm.cpp
-    src/test_utils.cpp)
+    src/RosenAbstractNode.cpp
+    src/StateMachine.cpp
+    src/AbstractNodeSm.cpp
+    src/TestUtils.cpp)
 
 add_dependencies(rosen_abstract_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rosen_abstract_node ${catkin_LIBRARIES} ${LIBRARY_CONFIGURATION_LINK_THIRDPARTIES} ${ROCAT_PACKAGE_NON_CATKIN_THIRDPARTIES})
@@ -106,7 +106,7 @@ target_link_libraries(rosen_abstract_node ${catkin_LIBRARIES} ${LIBRARY_CONFIGUR
 ######################################################################
 
 add_executable(dummy_node
-    src/dummy_node.cpp
+    src/DummyNode.cpp
 )
 add_dependencies(dummy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(dummy_node ${catkin_LIBRARIES} rosen_abstract_node)
@@ -116,7 +116,7 @@ target_link_libraries(dummy_node ${catkin_LIBRARIES} rosen_abstract_node)
 ###############################################################################
 
 add_executable(execute_transitions
-    src/execute_transitions.cpp
+    src/ExecuteTransitions.cpp
 )
 add_dependencies(execute_transitions ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(execute_transitions ${catkin_LIBRARIES} rosen_abstract_node)
@@ -126,7 +126,7 @@ target_link_libraries(execute_transitions ${catkin_LIBRARIES} rosen_abstract_nod
 ##############################################################################
 
 add_executable(manual_action_test
-    src/manual_action_test.cpp
+    src/ManualActionTest.cpp
 )
 add_dependencies(manual_action_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(manual_action_test ${catkin_LIBRARIES} rosen_abstract_node ${MENU_LIBRARY} ${CURSES_LIBRARIES})
