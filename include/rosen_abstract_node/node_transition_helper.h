@@ -1,12 +1,14 @@
 #ifndef ROSEN_ABSTRACT_NODE_NODE_TRANSITIONS_HELPER_H
 #define ROSEN_ABSTRACT_NODE_NODE_TRANSITIONS_HELPER_H
 
+#include "rosen_abstract_node/NodeTransition.h"
+
 #include <string>
 #include <unordered_map>
 
 namespace rosen_abstract_node
 {
-    enum NodeTransitionNo : unsigned char
+    enum node_transition_no : unsigned char
     {
         NONE = 0,
         INIT = 1,
@@ -18,20 +20,20 @@ namespace rosen_abstract_node
         STOP = 7
     };
 
-    const std::string INVALID_TRANSITION = "INVALID";
+    const std::string invalid_transition = "INVALID";
 
     namespace detail
     {
-        const std::unordered_map<NodeTransitionNo, std::string> TRANSITION_NAMES =
+        const std::unordered_map<node_transition_no, std::string> transition_names =
         {
-            { NodeTransitionNo::NONE, "NONE" },
-            { NodeTransitionNo::INIT, "INIT" },
-            { NodeTransitionNo::CONNECT, "CONNECT" },
-            { NodeTransitionNo::DISCONNECT, "DISCONNECT" },
-            { NodeTransitionNo::START, "START" },
-            { NodeTransitionNo::PAUSE, "PAUSE" },
-            { NodeTransitionNo::RESUME, "RESUME" },
-            { NodeTransitionNo::STOP, "STOP" },
+            { node_transition_no::NONE, "NONE" },
+            { node_transition_no::INIT, "INIT" },
+            { node_transition_no::CONNECT, "CONNECT" },
+            { node_transition_no::DISCONNECT, "DISCONNECT" },
+            { node_transition_no::START, "START" },
+            { node_transition_no::PAUSE, "PAUSE" },
+            { node_transition_no::RESUME, "RESUME" },
+            { node_transition_no::STOP, "STOP" },
         };
     }
 
@@ -42,9 +44,9 @@ namespace rosen_abstract_node
      *
      * @return True if the transition is a valid node transition, else False.
      */
-    inline bool isValid(const NodeTransitionNo transition)
+    inline bool is_valid(const node_transition_no transition)
     {
-        return detail::TRANSITION_NAMES.find(transition) != detail::TRANSITION_NAMES.end();
+        return detail::transition_names.find(transition) != detail::transition_names.end();
     }
 
     /**
@@ -55,16 +57,16 @@ namespace rosen_abstract_node
      * @return A string representation of the node transition or "INVALID" if the
      *         provided transition is not valid..
      */
-    inline const std::string& toString(const NodeTransitionNo transition)
+    inline const std::string& to_string(const node_transition_no transition)
     {
-        auto search = detail::TRANSITION_NAMES.find(transition);
-        if (search != detail::TRANSITION_NAMES.end())
+        auto search = detail::transition_names.find(transition);
+        if (search != detail::transition_names.end())
         {
             return search->second;
         }
         else
         {
-            return INVALID_TRANSITION;
+            return invalid_transition;
         }
     }
 
@@ -77,9 +79,9 @@ namespace rosen_abstract_node
          *
          * @return True if the transition is a valid node transition, else False.
          */
-        inline bool isValid(const unsigned char transition)
+        inline bool is_valid(const unsigned char transition)
         {
-            return isValid(NodeTransitionNo(transition));
+            return is_valid(node_transition_no(transition));
         }
 
         /**
@@ -90,9 +92,9 @@ namespace rosen_abstract_node
          * @return A string representation of the node transition or "INVALID" if the
          *         provided transition is not valid..
          */
-        inline const std::string& toString(const unsigned char transition)
+        inline const std::string& to_string(const unsigned char transition)
         {
-            return toString(NodeTransitionNo(transition));
+            return to_string(node_transition_no(transition));
         }
     }
 }

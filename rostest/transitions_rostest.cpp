@@ -1,4 +1,4 @@
-#include "rosen_abstract_node/TransitionsRostest.h"
+#include "rosen_abstract_node/transitions_rostest.h"
 
 int main(int argc, char** argv)
 {

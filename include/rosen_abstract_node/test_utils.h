@@ -12,54 +12,54 @@ namespace rosen_abstract_node
          * @brief Perform a node transition on the abstract node.
          *
          * @param nh              The ROS node handle.
-         * @param nodeName        The ROS node name of the abstract node.
-         * @param nodeTransition  This is the transition, which should be performed.
+         * @param node_name       The ROS node name of the abstract node.
+         * @param node_transition This is the transition, which should be performed.
          *
          * @return True if the transition is successful, otherwise False.
          * 
          */
-        bool doNodeTransition(ros::NodeHandle& nh, const std::string& nodeName, const uint8_t nodeTransition);
+        bool do_node_transition(ros::NodeHandle& nh, const std::string& node_name, const uint8_t node_transition);
 
         /**
          *
          * @brief Set the abstract node to running.
          *
          * @param nh              The ROS node handle.
-         * @param nodeName        The ROS node name of the abstract node.
+         * @param node_name       The ROS node name of the abstract node.
          *
          * @return True if the transition to running is successful, otherwise False.
          * 
          */
-        bool setNodeToRunning(ros::NodeHandle& nh, const std::string& nodeName);
+        bool set_node_to_running(ros::NodeHandle& nh, const std::string& node_name);
 
         /**
          *
          * @brief Wait until the abstract node is in an expected state.
          *
          * @param nh             The ROS node handle.
-         * @param nodeName       The ROS node name of the abstract node.
-         * @param expectedState  The expected state.
+         * @param node_name      The ROS node name of the abstract node.
+         * @param expected_state The expected state.
          * @param timout         After this duration the timout is triggered and this function return False.
          *
          * @return True if the abstract node is in the expected state, otherwise False.
          * 
          */
-        bool waitForNodeInState(ros::NodeHandle& nh, const std::string& nodeName, const uint8_t expectedState, const ros::Duration& timeout);
+        bool wait_for_node_in_state(ros::NodeHandle& nh, const std::string& node_name, const uint8_t expected_state, const ros::Duration& timeout);
 
         /**
          *
          * @brief Wait until the abstract node is running
          *
          * @param nh        The ROS node handle.
-         * @param nodeName  The ROS node name of the abstract node.
+         * @param node_name The ROS node name of the abstract node.
          * @param timout    After this duration the timout is triggered and this function returns False.
          *
          * @return True if the abstract node is running, otherwise False.
          * 
          */
-        bool waitForNodeRunning(ros::NodeHandle& nh, const std::string& nodeName, const ros::Duration& timeout);
+        bool wait_for_node_running(ros::NodeHandle& nh, const std::string& node_name, const ros::Duration& timeout);
 
-        class NodeClient
+        class node_client
         {
         /**
          *
@@ -69,22 +69,22 @@ namespace rosen_abstract_node
 
         private:
             ros::NodeHandle& nh;
-            const std::string& nodeName;
+            const std::string& node_name;
         public:
-            NodeClient(ros::NodeHandle& nh_, const std::string& nodeName_) : nh(nh_), nodeName(nodeName_) {}
+            node_client(ros::NodeHandle& nh_, const std::string& node_name_) : nh(nh_), node_name(node_name_) {}
 
             /**
              *
              * @brief Perform a node transition on the abstract node.
              *
-             * @param nodeTransition This is the transition, which should be performed.
+             * @param node_transition This is the transition, which should be performed.
              *
              * @return True if the transition is successful, otherwise False.
              * 
              */
-            bool doNodeTransition(const uint8_t nodeTransition)
+            bool do_node_transition(const uint8_t node_transition)
             {
-                return test_utils::doNodeTransition(nh, nodeName, nodeTransition);
+                return test_utils::do_node_transition(nh, node_name, node_transition);
             }
 
             /**
@@ -94,24 +94,24 @@ namespace rosen_abstract_node
              * @return True if the transition to running is successful, otherwise False.
              * 
              */
-            bool setNodeToRunning()
+            bool set_node_to_running()
             {
-                return test_utils::setNodeToRunning(nh, nodeName);
+                return test_utils::set_node_to_running(nh, node_name);
             }
 
             /**
              *
              * @brief Wait until the abstract node is in an expected state.
              *
-             * @param expectedState The expected state.
+             * @param expected_state The expected state.
              * @param timout         After this duration the timout is triggered and this function return False.
              *
              * @return True if the abstract node is in the expected state, otherwise False.
              * 
              */
-            bool waitForNodeInState(const uint8_t expectedState, const ros::Duration& timeout)
+            bool wait_for_node_in_state(const uint8_t expected_state, const ros::Duration& timeout)
             {
-                return test_utils::waitForNodeInState(nh, nodeName, expectedState, timeout);
+                return test_utils::wait_for_node_in_state(nh, node_name, expected_state, timeout);
             }
             
             /**
@@ -123,9 +123,9 @@ namespace rosen_abstract_node
              * @return True if the abstract node is running, otherwise False.
              * 
              */
-            bool waitForNodeRunning(const ros::Duration& timeout)
+            bool wait_for_node_running(const ros::Duration& timeout)
             {
-                return test_utils::waitForNodeRunning(nh, nodeName, timeout);
+                return test_utils::wait_for_node_running(nh, node_name, timeout);
             }            
         };
     }
