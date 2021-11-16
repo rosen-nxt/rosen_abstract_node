@@ -3,7 +3,7 @@
 
 #include "ros/ros.h"
 
-#include "rosen_abstract_node/test_utils.h"
+#include "rosen_abstract_node/TestUtils.h"
 
 int main(int argc, char **argv)
 {

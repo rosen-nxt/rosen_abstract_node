@@ -2,8 +2,8 @@
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
 #include "rosen_abstract_node/StateTransitionAction.h"
-#include "rosen_abstract_node/node_state_helper.h"
-#include "rosen_abstract_node/node_transition_helper.h"
+#include "rosen_abstract_node/NodeStateHelper.h"
+#include "rosen_abstract_node/NodeTransitionHelper.h"
 #include <signal.h>
 #include <string>
 

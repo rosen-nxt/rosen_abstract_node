@@ -4,8 +4,8 @@
 #include <functional>
 #include <vector>
 
-#include "rosen_abstract_node/node_state_helper.h"
-#include "rosen_abstract_node/node_transition_helper.h"
+#include "rosen_abstract_node/NodeStateHelper.h"
+#include "rosen_abstract_node/NodeTransitionHelper.h"
 
 
 namespace rosen_abstract_node

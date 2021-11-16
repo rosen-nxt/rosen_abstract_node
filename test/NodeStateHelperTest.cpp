@@ -1,5 +1,5 @@
 #include "rosen_abstract_node/NodeState.h"
-#include "rosen_abstract_node/node_state_helper.h"
+#include "rosen_abstract_node/NodeStateHelper.h"
 #include <limits>
 #include <string>
 #include <gtest/gtest.h>

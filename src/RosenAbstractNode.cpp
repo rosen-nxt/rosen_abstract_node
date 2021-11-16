@@ -1,4 +1,4 @@
-#include "rosen_abstract_node/rosen_abstract_node.h"
+#include "rosen_abstract_node/RosenAbstractNode.h"
 
 #include <boost/bind.hpp>
 #include <stdexcept>

@@ -10,11 +10,11 @@
 #include <diagnostic_updater/diagnostic_updater.h>
 #include <diagnostic_updater/publisher.h>
 
-#include "rosen_abstract_node/node_transition_helper.h"
-#include "rosen_abstract_node/node_state_helper.h"
+#include "rosen_abstract_node/NodeTransitionHelper.h"
+#include "rosen_abstract_node/NodeStateHelper.h"
 #include "rosen_abstract_node/NodeStateInfo.h"
 #include "rosen_abstract_node/StateTransitionAction.h"
-#include "rosen_abstract_node/abstract_node_sm.h"
+#include "rosen_abstract_node/AbstractNodeSm.h"
 
 /**
  *

@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "rosen_abstract_node/abstract_node_sm.h"
+#include "rosen_abstract_node/AbstractNodeSm.h"
 
 namespace rosen_abstract_node
 {

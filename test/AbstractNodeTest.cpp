@@ -1,6 +1,6 @@
 #include "rosen_abstract_node/NodeTransition.h"
 #include "rosen_abstract_node/NodeState.h"
-#include "rosen_abstract_node/rosen_abstract_node.h"
+#include "rosen_abstract_node/RosenAbstractNode.h"
 #include <memory>
 #include <string>
 #include <gtest/gtest.h>

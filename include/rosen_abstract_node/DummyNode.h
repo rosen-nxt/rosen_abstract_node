@@ -1,7 +1,7 @@
 #ifndef ROSEN_ABSTRACT_NODE_DUMMY_NODE_H
 #define ROSEN_ABSTRACT_NODE_DUMMY_NODE_H
 
-#include "rosen_abstract_node/rosen_abstract_node.h"
+#include "rosen_abstract_node/RosenAbstractNode.h"
 
 #include <ros/ros.h>
 

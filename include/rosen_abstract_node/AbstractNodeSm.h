@@ -1,7 +1,7 @@
 #ifndef ABSTRACT_NODE_SM_H
 #define ABSTRACT_NODE_SM_H
 
-#include "rosen_abstract_node/state_machine.h"
+#include "rosen_abstract_node/StateMachine.h"
 
 
 /**

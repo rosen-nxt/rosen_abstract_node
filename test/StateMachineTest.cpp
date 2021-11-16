@@ -1,6 +1,6 @@
-#include "rosen_abstract_node/state_machine.h"
-#include "rosen_abstract_node/node_state_helper.h"
-#include "rosen_abstract_node/node_transition_helper.h"
+#include "rosen_abstract_node/StateMachine.h"
+#include "rosen_abstract_node/NodeStateHelper.h"
+#include "rosen_abstract_node/NodeTransitionHelper.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>

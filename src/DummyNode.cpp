@@ -1,4 +1,4 @@
-#include "rosen_abstract_node/dummy_node.h"
+#include "rosen_abstract_node/DummyNode.h"
 
 #include <std_msgs/Int16.h>
 

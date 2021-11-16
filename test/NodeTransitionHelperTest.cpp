@@ -1,5 +1,5 @@
 #include "rosen_abstract_node/NodeTransition.h"
-#include "rosen_abstract_node/node_transition_helper.h"
+#include "rosen_abstract_node/NodeTransitionHelper.h"
 #include <limits>
 #include <string>
 #include <gtest/gtest.h>

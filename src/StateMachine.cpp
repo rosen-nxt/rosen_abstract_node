@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "rosen_abstract_node/state_machine.h"
+#include "rosen_abstract_node/StateMachine.h"
 
 namespace rosen_abstract_node
 {
