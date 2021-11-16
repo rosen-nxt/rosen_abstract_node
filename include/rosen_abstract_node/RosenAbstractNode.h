@@ -261,7 +261,7 @@ namespace rosen_abstract_node
             /**
              * @brief Gets the frequency the node is configured to loop with.
              *        It defines with which frequency the node performs transitions and calls doStep().
-             *        Is configurable by the ROS parameter ~/loopFrequency.
+             *        Is configurable by the ROS parameter ~/loop_frequency.
              * 
              * @return The frequency the node is configured to loop with.
              */
