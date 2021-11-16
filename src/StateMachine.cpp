@@ -4,35 +4,35 @@
 
 namespace rosen_abstract_node
 {
-    state_machine::state_machine(const node_state_no initial_state) : current_state(initial_state){}
+    StateMachine::StateMachine(const NodeStateNo initialState) : currentState(initialState){}
 
-    node_state_no state_machine::get_current_state() const
+    NodeStateNo StateMachine::getCurrentState() const
     {
-        return current_state;
+        return currentState;
     }
 
-    void state_machine::set_current_state(const node_state_no state)
+    void StateMachine::setCurrentState(const NodeStateNo state)
     {
-        current_state = state;
+        currentState = state;
     }
 
-    void state_machine::add_transition(const node_transition_no node_transition, const std::vector<node_state_no>& sources, const node_state_no target, std::function<bool()> callback)
+    void StateMachine::addTransition(const NodeTransitionNo nodeTransition, const std::vector<NodeStateNo>& sources, const NodeStateNo target, std::function<bool()> callback)
     {
-        state_machine_transition transition {sources, target, callback};
-        transitions.insert({node_transition, transition});
+        StateMachineTransition transition {sources, target, callback};
+        transitions.insert({nodeTransition, transition});
     }
 
-    bool state_machine::do_transition(node_transition_no node_transition)
+    bool StateMachine::doTransition(NodeTransitionNo nodeTransition)
     {
-        auto transition = transitions.at(node_transition);
+        auto transition = transitions.at(nodeTransition);
         auto sources = transition.sources;
 
-        // is current_state in sources?
-        if(std::find(sources.begin(), sources.end(), current_state) != sources.end()) {
+        // is currentState in sources?
+        if(std::find(sources.begin(), sources.end(), currentState) != sources.end()) {
             auto success = transition.callback();
             if (success)
             {
-                current_state = transition.target;
+                currentState = transition.target;
             }
             return success;
         }

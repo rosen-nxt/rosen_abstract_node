@@ -17,214 +17,214 @@ namespace rosen_abstract_node
         const ros::Duration CURRENT_STATE_FREQUENCY = ros::Duration(1.0);
     }
 
-    rosen_abstract_node::rosen_abstract_node(const unsigned char flags)
-    : rosen_abstract_node(ros::this_node::getName(), "~", flags)
+    RosenAbstractNode::RosenAbstractNode(const unsigned char flags)
+    : RosenAbstractNode(ros::this_node::getName(), "~", flags)
     {}
 
-    rosen_abstract_node::rosen_abstract_node(const std::string& node_name, const std::string& node_namespace, const unsigned char flags)
-    : rosen_abstract_node(node_name, std::make_shared<ros::NodeHandle>(node_namespace), std::make_shared<diagnostic_updater::Updater>(), flags)
+    RosenAbstractNode::RosenAbstractNode(const std::string& nodeName, const std::string& nodeNamespace, const unsigned char flags)
+    : RosenAbstractNode(nodeName, std::make_shared<ros::NodeHandle>(nodeNamespace), std::make_shared<diagnostic_updater::Updater>(), flags)
     {}
 
-    rosen_abstract_node::rosen_abstract_node(const std::string& node_name,
-                                             const std::shared_ptr<ros::NodeHandle>& ros_node_handle_private,
-                                             const std::shared_ptr<diagnostic_updater::Updater>& ros_diagnostic_updater,
-                                             const unsigned char flags)
+    RosenAbstractNode::RosenAbstractNode(const std::string& nodeName,
+                                         const std::shared_ptr<ros::NodeHandle>& rosNodeHandlePrivate,
+                                         const std::shared_ptr<diagnostic_updater::Updater>& rosDiagnosticUpdater,
+                                         const unsigned char flags)
     : flags(flags),
-      ros_node_name(node_name),
-      next_trans(node_transition_no::NONE),
-      state_transition_action_server(nullptr),
-      diag_updater(ros_diagnostic_updater),
-      wrapped_publishers(),
-      flags_publisher(nullptr),
-      loop_frequency(DEFAULT_LOOP_FREQUENCY),
-      sm(std::bind(&rosen_abstract_node::do_init, this),
-         std::bind(&rosen_abstract_node::do_connect, this),
-         std::bind(&rosen_abstract_node::do_disconnect, this),
-         std::bind(&rosen_abstract_node::do_start, this, std::placeholders::_1),
-         std::bind(&rosen_abstract_node::do_pause, this),
-         std::bind(&rosen_abstract_node::do_resume, this),
-         std::bind(&rosen_abstract_node::do_stop, this)),
-      node_handle_private(ros_node_handle_private)
+      rosNodeName(nodeName),
+      nextTrans(NodeTransitionNo::NONE),
+      stateTransitionActionServer(nullptr),
+      diagUpdater(rosDiagnosticUpdater),
+      wrappedPublishers(),
+      flagsPublisher(nullptr),
+      loopFrequency(DEFAULT_LOOP_FREQUENCY),
+      sm(std::bind(&RosenAbstractNode::doInit, this),
+         std::bind(&RosenAbstractNode::doConnect, this),
+         std::bind(&RosenAbstractNode::doDisconnect, this),
+         std::bind(&RosenAbstractNode::doStart, this, std::placeholders::_1),
+         std::bind(&RosenAbstractNode::doPause, this),
+         std::bind(&RosenAbstractNode::doResume, this),
+         std::bind(&RosenAbstractNode::doStop, this)),
+      nodeHandlePrivate(rosNodeHandlePrivate)
     {
-        if (ros_node_handle_private != nullptr)
+        if (rosNodeHandlePrivate != nullptr)
         {
-            state_transition_action_server = std::make_shared<actionlib::SimpleActionServer<StateTransitionAction>>(
-              *ros_node_handle_private,
+            stateTransitionActionServer = std::make_shared<actionlib::SimpleActionServer<StateTransitionAction>>(
+              *rosNodeHandlePrivate,
               "state_transition_action",
-              [&](const StateTransitionGoalConstPtr& goal) { this->sm_action_cb(goal); },
+              [&](const StateTransitionGoalConstPtr& goal) { this->smActionCb(goal); },
               false);
-            state_transition_action_server->start();
+            stateTransitionActionServer->start();
 
-            flags_publisher = std::make_shared<ros::Publisher>(node_handle_private->advertise<std_msgs::UInt8>("flags", 1, true));
-            publish_flags();
+            flagsPublisher = std::make_shared<ros::Publisher>(nodeHandlePrivate->advertise<std_msgs::UInt8>("flags", 1, true));
+            publishFlags();
         }
-        if (diag_updater != nullptr)
+        if (diagUpdater != nullptr)
         {
-            diag_updater->setHardwareID(node_name);
+            diagUpdater->setHardwareID(nodeName);
         }
     }
     
-    void rosen_abstract_node::sm_action_cb(const StateTransitionGoalConstPtr& goal)
+    void RosenAbstractNode::smActionCb(const StateTransitionGoalConstPtr& goal)
     {
-        transition_processed = false;
+        transitionProcessed = false;
 
-        const node_transition_no trans = node_transition_no(goal->transition);
-        if (is_valid(trans) && trans != node_transition_no::NONE)
+        const NodeTransitionNo trans = NodeTransitionNo(goal->transition);
+        if (isValid(trans) && trans != NodeTransitionNo::NONE)
         {
-            ROS_INFO_STREAM("abstract_node::sm_action_cb transition: " << to_string(trans));
+            ROS_INFO_STREAM("abstract_node::smActionCb transition: " << toString(trans));
 
-            StateTransitionFeedback state_transition_feedback;
-            state_transition_feedback.current_state = sm.get_current_state();
-            state_transition_feedback.transition = trans;
-            state_transition_action_server->publishFeedback(state_transition_feedback);
+            StateTransitionFeedback stateTransitionFeedback;
+            stateTransitionFeedback.current_state = sm.getCurrentState();
+            stateTransitionFeedback.transition = trans;
+            stateTransitionActionServer->publishFeedback(stateTransitionFeedback);
 
-            initiate_transition(trans);
+            initiateTransition(trans);
 
-            std::unique_lock<std::mutex> lock(transition_mutex);
-            transition_condition_variable.wait(lock, [&]{ return transition_processed; });
+            std::unique_lock<std::mutex> lock(transitionMutex);
+            transitionConditionVariable.wait(lock, [&]{ return transitionProcessed; });
         }
         else
         {
-            ROS_WARN("abstract_node::sm_action_cb received an invalid transition request: %i", trans);
-            transition_successful = false;
+            ROS_WARN("abstract_node::smActionCb received an invalid transition request: %i", trans);
+            transitionSuccessful = false;
         }
 
-        StateTransitionResult state_transition_result;
-        state_transition_result.new_state = sm.get_current_state();
-        if (transition_successful)
+        StateTransitionResult stateTransitionResult;
+        stateTransitionResult.new_state = sm.getCurrentState();
+        if (transitionSuccessful)
         {
-            state_transition_action_server->setSucceeded(state_transition_result);
+            stateTransitionActionServer->setSucceeded(stateTransitionResult);
         }
         else
         {
-            state_transition_action_server->setAborted(state_transition_result);
+            stateTransitionActionServer->setAborted(stateTransitionResult);
         }
     }
 
-    void rosen_abstract_node::initiate_transition(node_transition_no transition)
+    void RosenAbstractNode::initiateTransition(NodeTransitionNo transition)
     {
-        next_trans = transition;
+        nextTrans = transition;
     }
 
-    void rosen_abstract_node::initiate_transition(unsigned char transition)
+    void RosenAbstractNode::initiateTransition(unsigned char transition)
     {
-        initiate_transition(node_transition_no(transition));
+        initiateTransition(NodeTransitionNo(transition));
     }
 
-    void rosen_abstract_node::do_transition(const std::unique_ptr<ros::Publisher>& current_state_publisher)
+    void RosenAbstractNode::doTransition(const std::unique_ptr<ros::Publisher>& currentStatePublisher)
     {
-        if (next_trans == node_transition_no::NONE)
+        if (nextTrans == NodeTransitionNo::NONE)
         {
             return;
         }
 
         {
-            std::lock_guard<std::mutex> lock(transition_mutex);
-            transition_successful = false;
+            std::lock_guard<std::mutex> lock(transitionMutex);
+            transitionSuccessful = false;
 
             try
             {
-                transition_successful = sm.do_transition(next_trans);
+                transitionSuccessful = sm.doTransition(nextTrans);
             }
             catch (const std::out_of_range&)
             {
-                const auto message = "abstract_node::do_transition: Received invalid transition. Please check at caller!";
+                const auto message = "abstract_node::doTransition: Received invalid transition. Please check at caller!";
                 ROS_FATAL(message);
                 throw std::logic_error(message);
             }
 
-            if (nullptr != current_state_publisher)
+            if (nullptr != currentStatePublisher)
             {
-                NodeStateInfo node_state_info;
+                NodeStateInfo nodeStateInfo;
                 ros::Time now = ros::Time::now();
-                rosen_abstract_node::update_and_publish_node_state_info(*current_state_publisher, now, node_state_info);
+                RosenAbstractNode::updateAndPublishNodeStateInfo(*currentStatePublisher, now, nodeStateInfo);
             }
-            transition_processed = true;
-            next_trans = node_transition_no::NONE;
+            transitionProcessed = true;
+            nextTrans = NodeTransitionNo::NONE;
         }
 
-        transition_condition_variable.notify_one();
+        transitionConditionVariable.notify_one();
     }
 
-    bool rosen_abstract_node::get_transition_successful() const
+    bool RosenAbstractNode::getTransitionSuccessful() const
     {
-        return transition_successful;
+        return transitionSuccessful;
     }
 
-    unsigned int rosen_abstract_node::get_current_state() const
+    unsigned int RosenAbstractNode::getCurrentState() const
     {
-        return sm.get_current_state();
+        return sm.getCurrentState();
     }
 
-    void rosen_abstract_node::update_and_publish_node_state_info(const ros::Publisher& current_state_publisher, const ros::Time now, NodeStateInfo& node_state_info)
+    void RosenAbstractNode::updateAndPublishNodeStateInfo(const ros::Publisher& currentStatePublisher, const ros::Time now, NodeStateInfo& nodeStateInfo)
     {
-        node_state_info.current_state = sm.get_current_state();
-        node_state_info.header.stamp = now;
-        current_state_publisher.publish(node_state_info);
-        ++node_state_info.header.seq;
+        nodeStateInfo.current_state = sm.getCurrentState();
+        nodeStateInfo.header.stamp = now;
+        currentStatePublisher.publish(nodeStateInfo);
+        ++nodeStateInfo.header.seq;
     }
 
-    std::shared_ptr<diagnostic_updater::FrequencyStatus> rosen_abstract_node::create_frequency_status()
+    std::shared_ptr<diagnostic_updater::FrequencyStatus> RosenAbstractNode::createFrequencyStatus()
     {
-        auto frequency_param = diagnostic_updater::FrequencyStatusParam(&loop_frequency, &loop_frequency, 0.1, 10);
-        auto frequency_status = std::make_shared<diagnostic_updater::FrequencyStatus>(frequency_param);
-        diag_updater->add(*frequency_status);
-        return frequency_status;
+        auto frequencyParam = diagnostic_updater::FrequencyStatusParam(&loopFrequency, &loopFrequency, 0.1, 10);
+        auto frequencyStatus = std::make_shared<diagnostic_updater::FrequencyStatus>(frequencyParam);
+        diagUpdater->add(*frequencyStatus);
+        return frequencyStatus;
     }
 
-    void rosen_abstract_node::loop()
+    void RosenAbstractNode::loop()
     {
-        loop_frequency = node_handle_private->param("loop_frequency", DEFAULT_LOOP_FREQUENCY);
-        ROS_INFO_STREAM(ros_node_name << " is running with a frequency of " << loop_frequency << " Hz (ROS Time).");
+        loopFrequency = nodeHandlePrivate->param("loop_frequency", DEFAULT_LOOP_FREQUENCY);
+        ROS_INFO_STREAM(rosNodeName << " is running with a frequency of " << loopFrequency << " Hz (ROS Time).");
 
         ros::Time now = ros::Time::now();
-        ros::Rate loop_rate(loop_frequency);
-        auto frequency_status = create_frequency_status();
+        ros::Rate loopRate(loopFrequency);
+        auto frequencyStatus = createFrequencyStatus();
 
-        NodeStateInfo node_state_info;
-        node_state_info.header.seq = 0;
-        std::unique_ptr<ros::Publisher> current_state_publisher = std::make_unique<ros::Publisher>(node_handle_private->advertise<NodeStateInfo>("current_state", 10, false));
+        NodeStateInfo nodeStateInfo;
+        nodeStateInfo.header.seq = 0;
+        std::unique_ptr<ros::Publisher> currentStatePublisher = std::make_unique<ros::Publisher>(nodeHandlePrivate->advertise<NodeStateInfo>("current_state", 10, false));
 
-        ros::Time next_current_state_message = now;
+        ros::Time nextCurrentStateMessage = now;
 
         while (ros::ok())
         {
             now = ros::Time::now();
             ros::spinOnce();
-            do_transition(current_state_publisher);
+            doTransition(currentStatePublisher);
 
-            if (now >= next_current_state_message)
+            if (now >= nextCurrentStateMessage)
             {
-                update_and_publish_node_state_info(*current_state_publisher, now, node_state_info);
-                next_current_state_message = now + CURRENT_STATE_FREQUENCY;
+                updateAndPublishNodeStateInfo(*currentStatePublisher, now, nodeStateInfo);
+                nextCurrentStateMessage = now + CURRENT_STATE_FREQUENCY;
             }
 
-            do_step();
-            frequency_status->tick();
-            diag_updater->update();
-            loop_rate.sleep();
+            doStep();
+            frequencyStatus->tick();
+            diagUpdater->update();
+            loopRate.sleep();
         }
     }
 
-    std::shared_ptr<diagnostic_updater::Updater> rosen_abstract_node::get_diagnostic_updater()
+    std::shared_ptr<diagnostic_updater::Updater> RosenAbstractNode::getDiagnosticUpdater()
     {
-        return diag_updater;
+        return diagUpdater;
     }
 
-    double rosen_abstract_node::get_loop_frequency()
+    double RosenAbstractNode::getLoopFrequency()
     {
-        return loop_frequency;
+        return loopFrequency;
     }
 
-    unsigned char rosen_abstract_node::get_flags() const
+    unsigned char RosenAbstractNode::getFlags() const
     {
         return flags;
     }
 
-    void rosen_abstract_node::publish_flags() const
+    void RosenAbstractNode::publishFlags() const
     {
-        std_msgs::UInt8 flags_msg;
-        flags_msg.data = flags;
-        flags_publisher->publish(flags_msg);
+        std_msgs::UInt8 flagsMsg;
+        flagsMsg.data = flags;
+        flagsPublisher->publish(flagsMsg);
     }
 }

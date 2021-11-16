@@ -16,25 +16,25 @@ namespace rosen_abstract_node
         const std::function<bool(bool&)> EMPTY_START_CB = [](bool& running){running = true; return true;};
     }
 
-    class abstract_node_sm
+    class AbstractNodeSm
     {
         public:
             /**
-             * @param do_init       Optional function, which is during the INIT transition called.
-             * @param do_connect    Optional function, which is during the CONNECT transition called.
-             * @param do_disconnect Optional function, which is during the DISCONNECT transition called.
-             * @param do_start      Optional function, which is during the START transition called.
-             * @param do_pause      Optional function, which is during the PAUSE transition called.
-             * @param do_resume     Optional function, which is during the RESUME transition called.
-             * @param do_stop       Optional function, which is during the STOP transition called.
+             * @param doInit       Optional function, which is during the INIT transition called.
+             * @param doConnect    Optional function, which is during the CONNECT transition called.
+             * @param doDisconnect Optional function, which is during the DISCONNECT transition called.
+             * @param doStart      Optional function, which is during the START transition called.
+             * @param doPause      Optional function, which is during the PAUSE transition called.
+             * @param doResume     Optional function, which is during the RESUME transition called.
+             * @param doStop       Optional function, which is during the STOP transition called.
              */
-            abstract_node_sm(std::function<bool()> do_init = detail::EMPTY_CB,
-                             std::function<bool()> do_connect = detail::EMPTY_CB,
-                             std::function<bool()> do_disconnect = detail::EMPTY_CB,
-                             std::function<bool(bool&)> do_start = detail::EMPTY_START_CB,
-                             std::function<bool()> do_pause = detail::EMPTY_CB,
-                             std::function<bool()> do_resume = detail::EMPTY_CB,
-                             std::function<bool()> do_stop = detail::EMPTY_CB);
+            AbstractNodeSm(std::function<bool()> doInit = detail::EMPTY_CB,
+                            std::function<bool()> doConnect = detail::EMPTY_CB,
+                            std::function<bool()> doDisconnect = detail::EMPTY_CB,
+                            std::function<bool(bool&)> doStart = detail::EMPTY_START_CB,
+                            std::function<bool()> doPause = detail::EMPTY_CB,
+                            std::function<bool()> doResume = detail::EMPTY_CB,
+                            std::function<bool()> doStop = detail::EMPTY_CB);
 
             /**
              * @brief Check if the node is in a certain state.
@@ -43,7 +43,7 @@ namespace rosen_abstract_node
              * 
              * @return Whether or not the node is in the given state.
              */
-            bool is_in_node_state(const node_state_no state) const;
+            bool isInNodeState(const NodeStateNo state) const;
 
             /**
              * @brief Perform a transition.
@@ -52,23 +52,23 @@ namespace rosen_abstract_node
              * 
              * @return Whether or not the transition was successful.
              */
-            bool do_transition(node_transition_no next_trans);
+            bool doTransition(NodeTransitionNo nextTrans);
 
             /**
              * @brief Gets the current state of the node.
              * 
              * @return The current state of the node.
              */
-            node_state_no get_current_state() const;
+            NodeStateNo getCurrentState() const;
 
         private:
-            state_machine sm;
+            StateMachine sm;
 
-            void init_sm();
-            bool sm_start();
+            void initSm();
+            bool smStart();
 
-            const std::unordered_map<node_transition_no, std::function<bool()>> do_callbacks;
-            std::function<bool(bool&)> do_start;
+            const std::unordered_map<NodeTransitionNo, std::function<bool()>> doCallbacks;
+            std::function<bool(bool&)> doStart;
     };
 }
 

@@ -11,46 +11,46 @@ using namespace testing;
 
 namespace node_test
 {
-    class mock_abstract_node : public rosen_abstract_node::rosen_abstract_node
+    class MockAbstractNode : public rosen_abstract_node::RosenAbstractNode
     {
         public:
-            mock_abstract_node() :
-                rosen_abstract_node(std::string("node_name"), nullptr, nullptr, 42) {}
-            virtual ~mock_abstract_node() = default;
+            MockAbstractNode() :
+                RosenAbstractNode(std::string("node_name"), nullptr, nullptr, 42) {}
+            virtual ~MockAbstractNode() = default;
 
-            void do_loop_once()
+            void doLoopOnce()
             {
-                do_transition(nullptr);
-                do_step();
+                doTransition(nullptr);
+                doStep();
             }
 
-            MOCK_METHOD0(do_init, bool());
-            MOCK_METHOD0(do_stop, bool());
-            MOCK_METHOD0(do_connect, bool());
-            MOCK_METHOD0(do_disconnect, bool());
-            MOCK_METHOD0(do_configure_component, void());
-            MOCK_METHOD0(do_pause, bool());
-            MOCK_METHOD0(do_resume, bool());
-            MOCK_METHOD1(do_start, bool(bool& running));
+            MOCK_METHOD0(doInit, bool());
+            MOCK_METHOD0(doStop, bool());
+            MOCK_METHOD0(doConnect, bool());
+            MOCK_METHOD0(doDisconnect, bool());
+            MOCK_METHOD0(doConfigureComponent, void());
+            MOCK_METHOD0(doPause, bool());
+            MOCK_METHOD0(doResume, bool());
+            MOCK_METHOD1(doStart, bool(bool& running));
             
-            MOCK_METHOD0(do_step, void());
+            MOCK_METHOD0(doStep, void());
     };
 }
 
-TEST(abstract_node_test, flags_have_been_set)
+TEST(AbstractNodeTest, flagsHaveBeenSet)
 {
-    StrictMock<node_test::mock_abstract_node> node;
+    StrictMock<node_test::MockAbstractNode> node;
 
-    ASSERT_EQ(node.get_flags(), 42);
+    ASSERT_EQ(node.getFlags(), 42);
 }
 
-TEST(abstract_node_test, do_functions_are_called_in_the_loop)
+TEST(AbstractNodeTest, doFunctionsAreCalledInTheLoop)
 {
-    StrictMock<node_test::mock_abstract_node> node;
+    StrictMock<node_test::MockAbstractNode> node;
 
-    EXPECT_CALL(node, do_init()).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(node, do_step()).Times(1);
+    EXPECT_CALL(node, doInit()).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(node, doStep()).Times(1);
 
-    node.initiate_transition(NodeTransition::INIT);
-    node.do_loop_once();
+    node.initiateTransition(NodeTransition::INIT);
+    node.doLoopOnce();
 }

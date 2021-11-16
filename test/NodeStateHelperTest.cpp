@@ -7,42 +7,42 @@
 using namespace rosen_abstract_node;
 using namespace testing;
 
-TEST(node_state_test, to_string_uninitialized)
+TEST(NodeStateTest, toStringUninitialized)
 {
-    ASSERT_EQ(node_state_helper::to_string(NodeState::STOPPED), "STOPPED");
+    ASSERT_EQ(node_state_helper::toString(NodeState::STOPPED), "STOPPED");
 }
 
-TEST(node_state_test, to_string_node_configured)
+TEST(NodeStateTest, toStringNodeConfigured)
 {
-    ASSERT_EQ(node_state_helper::to_string(NodeState::NODE_CONFIGURED), "NODE_CONFIGURED");
+    ASSERT_EQ(node_state_helper::toString(NodeState::NODE_CONFIGURED), "NODE_CONFIGURED");
 }
 
-TEST(node_state_test, to_string_component_connected)
+TEST(NodeStateTest, toStringComponentConnected)
 {
-    ASSERT_EQ(node_state_helper::to_string(NodeState::COMPONENT_CONNECTED), "COMPONENT_CONNECTED");
+    ASSERT_EQ(node_state_helper::toString(NodeState::COMPONENT_CONNECTED), "COMPONENT_CONNECTED");
 }
 
-TEST(node_state_test, to_string_component_running)
+TEST(NodeStateTest, toStringComponentRunning)
 {
-    ASSERT_EQ(node_state_helper::to_string(NodeState::COMPONENT_RUNNING), "COMPONENT_RUNNING");
+    ASSERT_EQ(node_state_helper::toString(NodeState::COMPONENT_RUNNING), "COMPONENT_RUNNING");
 }
 
-TEST(node_state_test, to_string_component_paused)
+TEST(NodeStateTest, toStringComponentPaused)
 {
-    ASSERT_EQ(node_state_helper::to_string(NodeState::COMPONENT_PAUSED), "COMPONENT_PAUSED");
+    ASSERT_EQ(node_state_helper::toString(NodeState::COMPONENT_PAUSED), "COMPONENT_PAUSED");
 }
 
-TEST(node_state_test, to_string_component_disconnected)
+TEST(NodeStateTest, toStringComponentDisconnected)
 {
-    ASSERT_EQ(node_state_helper::to_string(NodeState::COMPONENT_DISCONNECTED), "COMPONENT_DISCONNECTED");
+    ASSERT_EQ(node_state_helper::toString(NodeState::COMPONENT_DISCONNECTED), "COMPONENT_DISCONNECTED");
 }
 
-TEST(node_state_test, to_string_min_unsigned_char_invalid)
+TEST(NodeStateTest, toStringMinUnsignedCharInvalid)
 {
-    ASSERT_EQ(node_state_helper::to_string(std::numeric_limits<unsigned char>::min()), "INVALID");
+    ASSERT_EQ(node_state_helper::toString(std::numeric_limits<unsigned char>::min()), "INVALID");
 }
 
-TEST(node_state_test, to_string_max_unsigned_char_invalid)
+TEST(NodeStateTest, toStringMaxUnsignedCharInvalid)
 {
-    ASSERT_EQ(node_state_helper::to_string(std::numeric_limits<unsigned char>::max()), "INVALID");
+    ASSERT_EQ(node_state_helper::toString(std::numeric_limits<unsigned char>::max()), "INVALID");
 }

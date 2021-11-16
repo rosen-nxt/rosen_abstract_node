@@ -7,52 +7,52 @@
 using namespace rosen_abstract_node;
 using namespace testing;
 
-TEST(node_transition_test, to_string_none)
+TEST(NodeTransitionTest, toStringNone)
 {
-    ASSERT_EQ(node_transition_helper::to_string(NodeTransition::NONE), "NONE");
+    ASSERT_EQ(node_transition_helper::toString(NodeTransition::NONE), "NONE");
 }
 
-TEST(node_transition_test, to_string_init)
+TEST(NodeTransitionTest, toStringInit)
 {
-    ASSERT_EQ(node_transition_helper::to_string(NodeTransition::INIT), "INIT");
+    ASSERT_EQ(node_transition_helper::toString(NodeTransition::INIT), "INIT");
 }
 
-TEST(node_transition_test, to_string_connect)
+TEST(NodeTransitionTest, toStringConnect)
 {
-    ASSERT_EQ(node_transition_helper::to_string(NodeTransition::CONNECT), "CONNECT");
+    ASSERT_EQ(node_transition_helper::toString(NodeTransition::CONNECT), "CONNECT");
 }
 
-TEST(node_transition_test, to_string_disconnect)
+TEST(NodeTransitionTest, toStringDisconnect)
 {
-    ASSERT_EQ(node_transition_helper::to_string(NodeTransition::DISCONNECT), "DISCONNECT");
+    ASSERT_EQ(node_transition_helper::toString(NodeTransition::DISCONNECT), "DISCONNECT");
 }
 
-TEST(node_transition_test, to_string_start)
+TEST(NodeTransitionTest, toStringStart)
 {
-    ASSERT_EQ(node_transition_helper::to_string(NodeTransition::START), "START");
+    ASSERT_EQ(node_transition_helper::toString(NodeTransition::START), "START");
 }
 
-TEST(node_transition_test, to_string_pause)
+TEST(NodeTransitionTest, toStringPause)
 {
-    ASSERT_EQ(node_transition_helper::to_string(NodeTransition::PAUSE), "PAUSE");
+    ASSERT_EQ(node_transition_helper::toString(NodeTransition::PAUSE), "PAUSE");
 }
 
-TEST(node_transition_test, to_string_resume)
+TEST(NodeTransitionTest, toStringResume)
 {
-    ASSERT_EQ(node_transition_helper::to_string(NodeTransition::RESUME), "RESUME");
+    ASSERT_EQ(node_transition_helper::toString(NodeTransition::RESUME), "RESUME");
 }
 
-TEST(node_transition_test, to_string_stop)
+TEST(NodeTransitionTest, toStringStop)
 {
-    ASSERT_EQ(node_transition_helper::to_string(NodeTransition::STOP), "STOP");
+    ASSERT_EQ(node_transition_helper::toString(NodeTransition::STOP), "STOP");
 }
 
-TEST(node_transition_test, to_string_min_unsigned_char_none)
+TEST(NodeTransitionTest, toStringMinUnsignedCharNone)
 {
-    ASSERT_EQ(node_transition_helper::to_string(std::numeric_limits<unsigned char>::min()), "NONE");
+    ASSERT_EQ(node_transition_helper::toString(std::numeric_limits<unsigned char>::min()), "NONE");
 }
 
-TEST(node_transition_test, to_string_max_unsigned_char_invalid)
+TEST(NodeTransitionTest, toStringMaxUnsignedCharInvalid)
 {
-    ASSERT_EQ(node_transition_helper::to_string(std::numeric_limits<unsigned char>::max()), "INVALID");
+    ASSERT_EQ(node_transition_helper::toString(std::numeric_limits<unsigned char>::max()), "INVALID");
 }

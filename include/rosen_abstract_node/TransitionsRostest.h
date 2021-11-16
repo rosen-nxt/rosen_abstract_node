@@ -20,118 +20,118 @@ namespace rosen_abstract_node::transitions_rostest
         testing::InitGoogleTest(&argc, argv);
         ros::init(argc, argv, "transitions_rostest");
         ros::NodeHandle nh("~");
-        auto test_filter = nh.param<std::string>("test_filter", "*");
-        auto test_filter_expression = "transitions_rostest." + test_filter;
-        testing::GTEST_FLAG(filter) = test_filter_expression;
+        auto testFilter = nh.param<std::string>("test_filter", "*");
+        auto testFilterExpression = "TransitionRostest." + testFilter;
+        testing::GTEST_FLAG(filter) = testFilterExpression;
         return RUN_ALL_TESTS();
     }
 
-    std::tuple<actionlib::SimpleClientGoalState::StateEnum, uint8_t> do_transition(const uint8_t node_transition)
+    std::tuple<actionlib::SimpleClientGoalState::StateEnum, uint8_t> doTransition(const uint8_t nodeTransition)
     {
         ros::NodeHandle nh("~");
-        const auto action_namespace = nh.param<std::string>("action_namespace", "");
-        const auto action_topic = action_namespace + "/state_transition_action";
-        actionlib::SimpleActionClient<StateTransitionAction> action_client(action_topic, true);
-        action_client.waitForServer();
+        const auto actionNamespace = nh.param<std::string>("action_namespace", "");
+        const auto actionTopic = actionNamespace + "/state_transition_action";
+        actionlib::SimpleActionClient<StateTransitionAction> actionClient(actionTopic, true);
+        actionClient.waitForServer();
 
         StateTransitionGoal goal;
-        goal.transition = node_transition;
-        const auto state = action_client.sendGoalAndWait(goal);
-        const auto result = action_client.getResult();
+        goal.transition = nodeTransition;
+        const auto state = actionClient.sendGoalAndWait(goal);
+        const auto result = actionClient.getResult();
 
         return std::make_tuple(state.state_, result->new_state);
     }
 
-    void test_transition(const uint8_t transition, const actionlib::SimpleClientGoalState::StateEnum expected_goal_state, const uint8_t expected_state)
+    void testTransition(const uint8_t transition, const actionlib::SimpleClientGoalState::StateEnum expectedGoalState, const uint8_t expectedState)
     {
-        actionlib::SimpleClientGoalState::StateEnum goal_state;
-        uint8_t new_state;
-        std::tie(goal_state, new_state) = do_transition(transition);
-        ASSERT_EQ(expected_goal_state, goal_state);
-        ASSERT_EQ(expected_state, new_state);
+        actionlib::SimpleClientGoalState::StateEnum goalState;
+        uint8_t newState;
+        std::tie(goalState, newState) = doTransition(transition);
+        ASSERT_EQ(expectedGoalState, goalState);
+        ASSERT_EQ(expectedState, newState);
     }
 
-    void configure_node_behaviour(const std::string& method, const bool configuration)
+    void configureNodeBehaviour(const std::string& method, const bool configuration)
     {
         ros::NodeHandle nh("~");
-        const auto action_namespace = nh.param<std::string>("configuration_namespace", "");
-        const auto parameter_name = action_namespace + "/dummy_node_" + method;
-        nh.setParam(parameter_name, configuration);
+        const auto actionNamespace = nh.param<std::string>("configuration_namespace", "");
+        const auto parameterName = actionNamespace + "/dummy_node_" + method;
+        nh.setParam(parameterName, configuration);
     }
 
-    void configure_do_init(const bool succeeds)
+    void configureDoInit(const bool succeeds)
     {
-        configure_node_behaviour("do_init_succeeds", succeeds);
+        configureNodeBehaviour("do_init_succeeds", succeeds);
     }
 
-    void configure_do_stop(const bool succeeds)
+    void configureDoStop(const bool succeeds)
     {
-        configure_node_behaviour("do_stop_succeeds", succeeds);
+        configureNodeBehaviour("do_stop_succeeds", succeeds);
     }
 
-    void configure_do_connect(const bool succeeds)
+    void configureDoConnect(const bool succeeds)
     {
-        configure_node_behaviour("do_connect_succeeds", succeeds);
+        configureNodeBehaviour("do_connect_succeeds", succeeds);
     }
 
-    void configure_do_disconnect(const bool succeeds)
+    void configureDoDisconnect(const bool succeeds)
     {
-        configure_node_behaviour("do_disconnect_succeeds", succeeds);
+        configureNodeBehaviour("do_disconnect_succeeds", succeeds);
     }
 
     void configure_do_pause(const bool succeeds)
     {
-        configure_node_behaviour("do_pause_succeeds", succeeds);
+        configureNodeBehaviour("do_pause_succeeds", succeeds);
     }
 
-    void configure_do_start(const bool succeeds, const bool running)
+    void configureDoStart(const bool succeeds, const bool running)
     {
-        configure_node_behaviour("do_start_succeeds", succeeds);
-        configure_node_behaviour("running", running);
+        configureNodeBehaviour("do_start_succeeds", succeeds);
+        configureNodeBehaviour("running", running);
     }
 
-    void configure_do_resume(const bool succeeds)
+    void configureDoResume(const bool succeeds)
     {
-        configure_node_behaviour("do_resume_succeeds", succeeds);
+        configureNodeBehaviour("do_resume_succeeds", succeeds);
     }
 
-    void set_node_to_state(const uint8_t desired_state)
+    void setNodeToState(const uint8_t desiredState)
     {
-        actionlib::SimpleClientGoalState::StateEnum action_state;
-        uint8_t new_state = rosen_abstract_node::NodeState::STOPPED;
+        actionlib::SimpleClientGoalState::StateEnum actionState;
+        uint8_t newState = rosen_abstract_node::NodeState::STOPPED;
 
-        switch(desired_state)
+        switch(desiredState)
         {
             case rosen_abstract_node::NodeState::STOPPED:
                 break;
             case rosen_abstract_node::NodeState::NODE_CONFIGURED:
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::INIT);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::INIT);
                 break;
             case rosen_abstract_node::NodeState::COMPONENT_CONNECTED:
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::INIT);
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::CONNECT);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::INIT);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::CONNECT);
                 break;
             case rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED:
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::INIT);
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::CONNECT);
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::DISCONNECT);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::INIT);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::CONNECT);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::DISCONNECT);
                 break;
             case rosen_abstract_node::NodeState::COMPONENT_RUNNING:
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::INIT);
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::CONNECT);
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::START);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::INIT);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::CONNECT);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::START);
                 break;
             case rosen_abstract_node::NodeState::COMPONENT_PAUSED:
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::INIT);
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::CONNECT);
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::START);
-                std::tie(action_state, new_state) = do_transition(rosen_abstract_node::NodeTransition::PAUSE);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::INIT);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::CONNECT);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::START);
+                std::tie(actionState, newState) = doTransition(rosen_abstract_node::NodeTransition::PAUSE);
                 break;
             default:
                 FAIL();
         }
 
-        ASSERT_EQ(desired_state, new_state);
+        ASSERT_EQ(desiredState, newState);
     }
 }
 
@@ -140,227 +140,227 @@ namespace rosen_abstract_node::transitions_rostest
  * Invalid or unknown transitions
  */ 
 
-TEST(transitions_rostest, goal_state_aborted_after_unknown_transition)
+TEST(TransitionRostest, goalStateAbortedAfterUnknownTransition)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::STOPPED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::STOPPED);
 
-    rosen_abstract_node::transitions_rostest::test_transition(UINT8_MAX, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::STOPPED);
+    rosen_abstract_node::transitions_rostest::testTransition(UINT8_MAX, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::STOPPED);
 }
 
 /*
  * rosen_abstract_node::NodeState::STOPPED
  */ 
 
-TEST(transitions_rostest, node_stopped_init_valid_success)
+TEST(TransitionRostest, nodeStoppedInitValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::STOPPED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::STOPPED);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::INIT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::NODE_CONFIGURED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::INIT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::NODE_CONFIGURED);
 }
 
-TEST(transitions_rostest, node_stopped_init_valid_fail)
+TEST(TransitionRostest, nodeStoppedInitValidFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::STOPPED);
-    rosen_abstract_node::transitions_rostest::configure_do_init(false);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::STOPPED);
+    rosen_abstract_node::transitions_rostest::configureDoInit(false);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::INIT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::STOPPED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::INIT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::STOPPED);
 }
 
 /*
  * rosen_abstract_node::NodeState::NODE_CONFIGURED
  */ 
 
-TEST(transitions_rostest, node_configured_connect_valid_success)
+TEST(TransitionRostest, nodeConfiguredConnectValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::NODE_CONFIGURED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::NODE_CONFIGURED);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::CONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::CONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 }
 
-TEST(transitions_rostest, node_configured_connect_valid_fail)
+TEST(TransitionRostest, nodeConfiguredConnectValidFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::NODE_CONFIGURED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::NODE_CONFIGURED);
 
-    rosen_abstract_node::transitions_rostest::configure_do_connect(false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::CONNECT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::NODE_CONFIGURED);
+    rosen_abstract_node::transitions_rostest::configureDoConnect(false);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::CONNECT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::NODE_CONFIGURED);
 }
 
-TEST(transitions_rostest, node_configured_stop_valid_success)
+TEST(TransitionRostest, nodeConfiguredStopValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::NODE_CONFIGURED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::NODE_CONFIGURED);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::STOP, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::STOPPED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::STOP, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::STOPPED);
 }
 
-TEST(transitions_rostest, node_configured_stop_valid_fail)
+TEST(TransitionRostest, nodeConfiguredStopValidFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::NODE_CONFIGURED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::NODE_CONFIGURED);
 
-    rosen_abstract_node::transitions_rostest::configure_do_stop(false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::STOP, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::NODE_CONFIGURED);
+    rosen_abstract_node::transitions_rostest::configureDoStop(false);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::STOP, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::NODE_CONFIGURED);
 }
 
 /*
  * rosen_abstract_node::NodeState::COMPONENT_CONNECTED
  */ 
 
-TEST(transitions_rostest, node_connected_disconnect_valid_success)
+TEST(TransitionRostest, nodeConnectedDisconnectValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
 }
 
-TEST(transitions_rostest, node_connected_disconnect_valid_fail)
+TEST(TransitionRostest, nodeConnectedDisconnectValidFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 
-    rosen_abstract_node::transitions_rostest::configure_do_disconnect(false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::configureDoDisconnect(false);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 }
 
-TEST(transitions_rostest, node_connected_start_valid_running_success)
+TEST(TransitionRostest, nodeConnectedStartValidRunningSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::START, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_RUNNING);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::START, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_RUNNING);
 }
 
-TEST(transitions_rostest, node_connected_start_valid_running_fail)
+TEST(TransitionRostest, nodeConnectedStartValidRunningFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 
-    rosen_abstract_node::transitions_rostest::configure_do_start(false, true);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::START, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::configureDoStart(false, true);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::START, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 }
 
-TEST(transitions_rostest, node_connected_start_valid_paused_success)
+TEST(TransitionRostest, nodeConnectedStartValidPausedSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 
-    rosen_abstract_node::transitions_rostest::configure_do_start(true, false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::START, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_PAUSED);
+    rosen_abstract_node::transitions_rostest::configureDoStart(true, false);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::START, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_PAUSED);
 }
 
-TEST(transitions_rostest, node_connected_start_valid_paused_fail)
+TEST(TransitionRostest, nodeConnectedStartValidPausedFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 
-    rosen_abstract_node::transitions_rostest::configure_do_start(false, false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::START, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::configureDoStart(false, false);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::START, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 }
 
 /*
  * rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED
  */ 
 
-TEST(transitions_rostest, node_disconnected_connect_valid_success)
+TEST(TransitionRostest, nodeDisconnectedConnectValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::CONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::CONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
 }
 
-TEST(transitions_rostest, node_disconnected_connect_valid_fail)
+TEST(TransitionRostest, nodeDisconnectedConnectValidFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
 
-    rosen_abstract_node::transitions_rostest::configure_do_connect(false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::CONNECT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
+    rosen_abstract_node::transitions_rostest::configureDoConnect(false);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::CONNECT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
 }
 
-TEST(transitions_rostest, node_disconnected_stop_valid_success)
+TEST(TransitionRostest, nodeDisconnectedStopValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::STOP, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::STOPPED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::STOP, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::STOPPED);
 }
 
-TEST(transitions_rostest, node_disconnected_stop_valid_fail)
+TEST(TransitionRostest, nodeDisconnectedStopValidFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
 
-    rosen_abstract_node::transitions_rostest::configure_do_stop(false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::STOP, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
+    rosen_abstract_node::transitions_rostest::configureDoStop(false);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::STOP, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
 }
 
 /*
  * rosen_abstract_node::NodeState::COMPONENT_RUNNING
  */ 
 
-TEST(transitions_rostest, node_running_disconnect_valid_success)
+TEST(TransitionRostest, nodeRunningDisconnectValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_RUNNING);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_RUNNING);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
 }
 
-TEST(transitions_rostest, node_running_disconnect_valid_fail)
+TEST(TransitionRostest, nodeRunningDisconnectValidFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_RUNNING);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_RUNNING);
 
-    rosen_abstract_node::transitions_rostest::configure_do_disconnect(false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_RUNNING);
+    rosen_abstract_node::transitions_rostest::configureDoDisconnect(false);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_RUNNING);
 }
 
-TEST(transitions_rostest, node_running_pause_valid_success)
+TEST(TransitionRostest, nodeRunningPauseValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_RUNNING);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_RUNNING);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::PAUSE, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_PAUSED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::PAUSE, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_PAUSED);
 }
 
-TEST(transitions_rostest, node_running_pause_valid_fail)
+TEST(TransitionRostest, nodeRunningPauseValidFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_RUNNING);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_RUNNING);
 
     rosen_abstract_node::transitions_rostest::configure_do_pause(false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::PAUSE, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_RUNNING);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::PAUSE, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_RUNNING);
 }
 
-TEST(transitions_rostest, node_running_stop_and_start_valid_success)
+TEST(TransitionRostest, nodeRunningStopAndStartValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_RUNNING);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_RUNNING);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::STOP, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::STOPPED);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::INIT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::NODE_CONFIGURED);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::CONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::START, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_RUNNING);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::STOP, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::STOPPED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::INIT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::NODE_CONFIGURED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::CONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_CONNECTED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::START, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_RUNNING);
 }
 
 /*
  * rosen_abstract_node::NodeState::COMPONENT_PAUSED
  */ 
 
-TEST(transitions_rostest, node_paused_disconnect_valid_success)
+TEST(TransitionRostest, nodePausedDisconnectValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_PAUSED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_PAUSED);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_DISCONNECTED);
 }
 
-TEST(transitions_rostest, node_paused_disconnect_valid_fail)
+TEST(TransitionRostest, nodePausedDisconnectValidFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_PAUSED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_PAUSED);
 
-    rosen_abstract_node::transitions_rostest::configure_do_disconnect(false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_PAUSED);
+    rosen_abstract_node::transitions_rostest::configureDoDisconnect(false);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::DISCONNECT, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_PAUSED);
 }
 
-TEST(transitions_rostest, node_paused_resume_valid_success)
+TEST(TransitionRostest, nodePausedResumeValidSuccess)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_PAUSED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_PAUSED);
 
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::RESUME, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_RUNNING);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::RESUME, actionlib::SimpleClientGoalState::SUCCEEDED, rosen_abstract_node::NodeState::COMPONENT_RUNNING);
 }
 
-TEST(transitions_rostest, node_paused_resume_valid_fail)
+TEST(TransitionRostest, nodePausedResumeValidFail)
 {
-    rosen_abstract_node::transitions_rostest::set_node_to_state(rosen_abstract_node::NodeState::COMPONENT_PAUSED);
+    rosen_abstract_node::transitions_rostest::setNodeToState(rosen_abstract_node::NodeState::COMPONENT_PAUSED);
 
-    rosen_abstract_node::transitions_rostest::configure_do_resume(false);
-    rosen_abstract_node::transitions_rostest::test_transition(rosen_abstract_node::NodeTransition::RESUME, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_PAUSED);
+    rosen_abstract_node::transitions_rostest::configureDoResume(false);
+    rosen_abstract_node::transitions_rostest::testTransition(rosen_abstract_node::NodeTransition::RESUME, actionlib::SimpleClientGoalState::ABORTED, rosen_abstract_node::NodeState::COMPONENT_PAUSED);
 }
 
 #endif

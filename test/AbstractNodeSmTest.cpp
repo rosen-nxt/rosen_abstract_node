@@ -8,207 +8,207 @@ using namespace rosen_abstract_node;
 using namespace testing;
 
 
-std::function<bool()> cb(const bool return_value)
+std::function<bool()> cb(const bool returnValue)
 {
-    return [return_value](){return return_value;};
+    return [returnValue](){return returnValue;};
 }
 
-std::function<bool(bool&)> start_cb(const bool running_arg, const bool return_value)
+std::function<bool(bool&)> startCb(const bool runningArg, const bool returnValue)
 {
-    return [running_arg, return_value](bool& running){running = running_arg; return return_value;};
+    return [runningArg, returnValue](bool& running){running = runningArg; return returnValue;};
 }
 
-TEST(abstract_node_sm_test, initial_state)
+TEST(AbstractNodeSmTest, initialState)
 {
-    abstract_node_sm sm;
-    ASSERT_EQ(node_state_no::STOPPED, sm.get_current_state());
+    AbstractNodeSm sm;
+    ASSERT_EQ(NodeStateNo::STOPPED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_configured_after_init_if_successful)
+TEST(AbstractNodeSmTest, nodeConfiguredAfterInitIfSuccessful)
 {
-    abstract_node_sm sm;
+    AbstractNodeSm sm;
 
-    sm.do_transition(node_transition_no::INIT);
-    ASSERT_EQ(node_state_no::NODE_CONFIGURED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    ASSERT_EQ(NodeStateNo::NODE_CONFIGURED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_still_stopped_after_init_if_failed)
+TEST(AbstractNodeSmTest, nodeStillStoppedAfterInitIfFailed)
 {
-    abstract_node_sm sm(cb(false));
+    AbstractNodeSm sm(cb(false));
 
-    sm.do_transition(node_transition_no::INIT);
-    ASSERT_EQ(node_state_no::STOPPED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    ASSERT_EQ(NodeStateNo::STOPPED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_connected_after_connect_if_successful)
+TEST(AbstractNodeSmTest, nodeConnectedAfterConnectIfSuccessful)
 {
-    abstract_node_sm sm;
+    AbstractNodeSm sm;
 
-    sm.do_transition(node_transition_no::INIT);
-    ASSERT_EQ(node_state_no::NODE_CONFIGURED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    ASSERT_EQ(NodeStateNo::NODE_CONFIGURED, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::CONNECT);
-    ASSERT_EQ(node_state_no::COMPONENT_CONNECTED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    ASSERT_EQ(NodeStateNo::COMPONENT_CONNECTED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, still_configured_after_connect_if_failed)
+TEST(AbstractNodeSmTest, stillConfiguredAfterConnectIfFailed)
 {
-    abstract_node_sm sm(cb(true), cb(false));
+    AbstractNodeSm sm(cb(true), cb(false));
 
-    sm.do_transition(node_transition_no::INIT);
-    ASSERT_EQ(node_state_no::NODE_CONFIGURED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    ASSERT_EQ(NodeStateNo::NODE_CONFIGURED, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::CONNECT);
-    ASSERT_EQ(node_state_no::NODE_CONFIGURED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    ASSERT_EQ(NodeStateNo::NODE_CONFIGURED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_running_after_start_if_successful_and_not_paused)
+TEST(AbstractNodeSmTest, nodeRunningAfterStartIfSuccessfulAndNotPaused)
 {
-    abstract_node_sm sm;
+    AbstractNodeSm sm;
 
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    ASSERT_EQ(node_state_no::COMPONENT_CONNECTED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    ASSERT_EQ(NodeStateNo::COMPONENT_CONNECTED, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::START);
-    ASSERT_EQ(node_state_no::COMPONENT_RUNNING, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::START);
+    ASSERT_EQ(NodeStateNo::COMPONENT_RUNNING, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_paused_after_start_if_successful_and_paused)
+TEST(AbstractNodeSmTest, nodePausedAfterStartIfSuccessfulAndPaused)
 {
-    abstract_node_sm sm(cb(true), cb(true), cb(true), start_cb(false, true));
+    AbstractNodeSm sm(cb(true), cb(true), cb(true), startCb(false, true));
 
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    ASSERT_EQ(node_state_no::COMPONENT_CONNECTED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    ASSERT_EQ(NodeStateNo::COMPONENT_CONNECTED, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::START);
-    ASSERT_EQ(node_state_no::COMPONENT_PAUSED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::START);
+    ASSERT_EQ(NodeStateNo::COMPONENT_PAUSED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_paused_when_running_and_pause_triggered)
+TEST(AbstractNodeSmTest, nodePausedWhenRunningAndPauseTriggered)
 {
-    abstract_node_sm sm;
+    AbstractNodeSm sm;
 
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    sm.do_transition(node_transition_no::START);
-    ASSERT_EQ(node_state_no::COMPONENT_RUNNING, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    sm.doTransition(NodeTransitionNo::START);
+    ASSERT_EQ(NodeStateNo::COMPONENT_RUNNING, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::PAUSE);
-    ASSERT_EQ(node_state_no::COMPONENT_PAUSED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::PAUSE);
+    ASSERT_EQ(NodeStateNo::COMPONENT_PAUSED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_still_running_when_running_and_pause_failed)
+TEST(AbstractNodeSmTest, nodeStillRunningWhenRunningAndPauseFailed)
 {
-    abstract_node_sm sm(cb(true), cb(true), cb(true), start_cb(true, true), cb(false));
+    AbstractNodeSm sm(cb(true), cb(true), cb(true), startCb(true, true), cb(false));
 
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    sm.do_transition(node_transition_no::START);
-    ASSERT_EQ(node_state_no::COMPONENT_RUNNING, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    sm.doTransition(NodeTransitionNo::START);
+    ASSERT_EQ(NodeStateNo::COMPONENT_RUNNING, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::PAUSE);
-    ASSERT_EQ(node_state_no::COMPONENT_RUNNING, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::PAUSE);
+    ASSERT_EQ(NodeStateNo::COMPONENT_RUNNING, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_running_when_paused_and_resume_triggered)
+TEST(AbstractNodeSmTest, nodeRunningWhenPausedAndResumeTriggered)
 {
-    abstract_node_sm sm(cb(true), cb(true), cb(true), start_cb(false, true));
+    AbstractNodeSm sm(cb(true), cb(true), cb(true), startCb(false, true));
 
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    sm.do_transition(node_transition_no::START);
-    ASSERT_EQ(node_state_no::COMPONENT_PAUSED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    sm.doTransition(NodeTransitionNo::START);
+    ASSERT_EQ(NodeStateNo::COMPONENT_PAUSED, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::RESUME);
-    ASSERT_EQ(node_state_no::COMPONENT_RUNNING, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::RESUME);
+    ASSERT_EQ(NodeStateNo::COMPONENT_RUNNING, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_still_paused_when_paused_and_resume_failed)
+TEST(AbstractNodeSmTest, nodeStillPausedWhenPausedAndResumeFailed)
 {
-    abstract_node_sm sm(cb(true), cb(true), cb(true), start_cb(false, true), cb(true), cb(false));
+    AbstractNodeSm sm(cb(true), cb(true), cb(true), startCb(false, true), cb(true), cb(false));
 
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    sm.do_transition(node_transition_no::START);
-    ASSERT_EQ(node_state_no::COMPONENT_PAUSED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    sm.doTransition(NodeTransitionNo::START);
+    ASSERT_EQ(NodeStateNo::COMPONENT_PAUSED, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::RESUME);
-    ASSERT_EQ(node_state_no::COMPONENT_PAUSED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::RESUME);
+    ASSERT_EQ(NodeStateNo::COMPONENT_PAUSED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_disconnected_when_running_and_disconnect_triggered)
+TEST(AbstractNodeSmTest, nodeDisconnectedWhenRunningAndDisconnectTriggered)
 {
-    abstract_node_sm sm;
+    AbstractNodeSm sm;
 
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    sm.do_transition(node_transition_no::START);
-    ASSERT_EQ(node_state_no::COMPONENT_RUNNING, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    sm.doTransition(NodeTransitionNo::START);
+    ASSERT_EQ(NodeStateNo::COMPONENT_RUNNING, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::DISCONNECT);
-    ASSERT_EQ(node_state_no::COMPONENT_DISCONNECTED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::DISCONNECT);
+    ASSERT_EQ(NodeStateNo::COMPONENT_DISCONNECTED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_still_running_when_running_and_disconnect_fails)
+TEST(AbstractNodeSmTest, nodeStillRunningWhenRunningAndDisconnectFails)
 {
-    abstract_node_sm sm(cb(true), cb(true), cb(false));
+    AbstractNodeSm sm(cb(true), cb(true), cb(false));
 
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    sm.do_transition(node_transition_no::START);
-    ASSERT_EQ(node_state_no::COMPONENT_RUNNING, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    sm.doTransition(NodeTransitionNo::START);
+    ASSERT_EQ(NodeStateNo::COMPONENT_RUNNING, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::DISCONNECT);
-    ASSERT_EQ(node_state_no::COMPONENT_RUNNING, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::DISCONNECT);
+    ASSERT_EQ(NodeStateNo::COMPONENT_RUNNING, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_disconnected_when_paused_and_disconnect_triggered)
+TEST(AbstractNodeSmTest, nodeDisconnectedWhenPausedAndDisconnectTriggered)
 {
-    abstract_node_sm sm(cb(true), cb(true), cb(true), start_cb(false, true));
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    sm.do_transition(node_transition_no::START);
-    ASSERT_EQ(node_state_no::COMPONENT_PAUSED, sm.get_current_state());
+    AbstractNodeSm sm(cb(true), cb(true), cb(true), startCb(false, true));
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    sm.doTransition(NodeTransitionNo::START);
+    ASSERT_EQ(NodeStateNo::COMPONENT_PAUSED, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::DISCONNECT);
-    ASSERT_EQ(node_state_no::COMPONENT_DISCONNECTED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::DISCONNECT);
+    ASSERT_EQ(NodeStateNo::COMPONENT_DISCONNECTED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_still_paused_when_paused_and_disconnect_fails)
+TEST(AbstractNodeSmTest, nodeStillPausedWhenPausedAndDisconnectFails)
 {
-    abstract_node_sm sm(cb(true), cb(true), cb(false), start_cb(false, true));
+    AbstractNodeSm sm(cb(true), cb(true), cb(false), startCb(false, true));
 
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    sm.do_transition(node_transition_no::START);
-    ASSERT_EQ(node_state_no::COMPONENT_PAUSED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    sm.doTransition(NodeTransitionNo::START);
+    ASSERT_EQ(NodeStateNo::COMPONENT_PAUSED, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::DISCONNECT);
-    ASSERT_EQ(node_state_no::COMPONENT_PAUSED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::DISCONNECT);
+    ASSERT_EQ(NodeStateNo::COMPONENT_PAUSED, sm.getCurrentState());
 }
 
-TEST(abstract_node_test, node_stopped_when_disconnected_and_stop_triggered)
+TEST(abstract_node_test, nodeStoppedWhenDisconnectedAndStopTriggered)
 {
-    abstract_node_sm sm;
+    AbstractNodeSm sm;
 
-    sm.do_transition(node_transition_no::INIT);
-    sm.do_transition(node_transition_no::CONNECT);
-    sm.do_transition(node_transition_no::DISCONNECT);
-    ASSERT_EQ(node_state_no::COMPONENT_DISCONNECTED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    sm.doTransition(NodeTransitionNo::CONNECT);
+    sm.doTransition(NodeTransitionNo::DISCONNECT);
+    ASSERT_EQ(NodeStateNo::COMPONENT_DISCONNECTED, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::STOP);
-    ASSERT_EQ(node_state_no::STOPPED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::STOP);
+    ASSERT_EQ(NodeStateNo::STOPPED, sm.getCurrentState());
 }
 
-TEST(abstract_node_sm_test, node_stopped_when_configured_and_stop_triggered)
+TEST(AbstractNodeSmTest, nodeStoppedWhenConfiguredAndStopTriggered)
 {
-    abstract_node_sm sm;
+    AbstractNodeSm sm;
 
-    sm.do_transition(node_transition_no::INIT);
-    ASSERT_EQ(node_state_no::NODE_CONFIGURED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::INIT);
+    ASSERT_EQ(NodeStateNo::NODE_CONFIGURED, sm.getCurrentState());
 
-    sm.do_transition(node_transition_no::STOP);
-    ASSERT_EQ(node_state_no::STOPPED, sm.get_current_state());
+    sm.doTransition(NodeTransitionNo::STOP);
+    ASSERT_EQ(NodeStateNo::STOPPED, sm.getCurrentState());
 }

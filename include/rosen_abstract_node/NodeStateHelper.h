@@ -6,7 +6,7 @@
 
 namespace rosen_abstract_node
 {
-    enum node_state_no : unsigned char
+    enum NodeStateNo : unsigned char
     {
         STOPPED = 1,
         NODE_CONFIGURED = 2,
@@ -16,18 +16,18 @@ namespace rosen_abstract_node
         COMPONENT_DISCONNECTED = 6
     };
 
-    const std::string invalid_state = "INVALID";
+    const std::string INVALID_STATE = "INVALID";
 
     namespace detail
     {
-        const std::unordered_map<node_state_no, std::string> state_names =
+        const std::unordered_map<NodeStateNo, std::string> STATE_NAMES =
         {
-            { node_state_no::STOPPED, "STOPPED" },
-            { node_state_no::NODE_CONFIGURED, "NODE_CONFIGURED" },
-            { node_state_no::COMPONENT_CONNECTED, "COMPONENT_CONNECTED" },
-            { node_state_no::COMPONENT_RUNNING, "COMPONENT_RUNNING" },
-            { node_state_no::COMPONENT_PAUSED, "COMPONENT_PAUSED" },
-            { node_state_no::COMPONENT_DISCONNECTED, "COMPONENT_DISCONNECTED" }
+            { NodeStateNo::STOPPED, "STOPPED" },
+            { NodeStateNo::NODE_CONFIGURED, "NODE_CONFIGURED" },
+            { NodeStateNo::COMPONENT_CONNECTED, "COMPONENT_CONNECTED" },
+            { NodeStateNo::COMPONENT_RUNNING, "COMPONENT_RUNNING" },
+            { NodeStateNo::COMPONENT_PAUSED, "COMPONENT_PAUSED" },
+            { NodeStateNo::COMPONENT_DISCONNECTED, "COMPONENT_DISCONNECTED" }
         };
     }
 
@@ -38,9 +38,9 @@ namespace rosen_abstract_node
      *
      * @return True if the state is a valid node state, else False.
      */
-    inline bool is_valid(const node_state_no state)
+    inline bool isValid(const NodeStateNo state)
     {
-        return detail::state_names.find(state) != detail::state_names.end();
+        return detail::STATE_NAMES.find(state) != detail::STATE_NAMES.end();
     }
 
     /**
@@ -51,16 +51,16 @@ namespace rosen_abstract_node
      * @return A string representation of the node state or "INVALID" if the
      * provided state is not valid.
      */
-    inline const std::string& to_string(const node_state_no state)
+    inline const std::string& toString(const NodeStateNo state)
     {
-        auto search = detail::state_names.find(state);
-        if (search != detail::state_names.end())
+        auto search = detail::STATE_NAMES.find(state);
+        if (search != detail::STATE_NAMES.end())
         {
             return search->second;
         }
         else
         {
-            return invalid_state;
+            return INVALID_STATE;
         }
     }
 
@@ -73,9 +73,9 @@ namespace rosen_abstract_node
          *
          * @return True if the state is a valid node state, else False.
          */
-        inline bool is_valid(const unsigned char state)
+        inline bool isValid(const unsigned char state)
         {
-            return is_valid(node_state_no(state));
+            return isValid(NodeStateNo(state));
         }
 
         /**
@@ -86,9 +86,9 @@ namespace rosen_abstract_node
          * @return A string representation of the node state or "INVALID" if the
          * provided state is not valid.
          */
-        inline const std::string& to_string(const unsigned char state)
+        inline const std::string& toString(const unsigned char state)
         {
-            return to_string(node_state_no(state));
+            return toString(NodeStateNo(state));
         }
 
     }

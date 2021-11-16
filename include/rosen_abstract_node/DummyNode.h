@@ -7,23 +7,23 @@
 
 namespace rosen_abstract_node
 {
-    class dummy_node : public rosen_abstract_node
+    class DummyNode : public RosenAbstractNode
     {
         public:
-            dummy_node();
-            virtual ~dummy_node() = default;
+            DummyNode();
+            virtual ~DummyNode() = default;
 
         private:
-            ros::Publisher test_publisher;
+            ros::Publisher testPublisher;
 
-            bool do_init() override;
-            bool do_stop() override;
-            bool do_connect() override;
-            bool do_disconnect() override;
-            bool do_pause() override;
-            bool do_start(bool& running) override;
-            bool do_resume() override;
-            void do_step() override;
+            bool doInit() override;
+            bool doStop() override;
+            bool doConnect() override;
+            bool doDisconnect() override;
+            bool doPause() override;
+            bool doStart(bool& running) override;
+            bool doResume() override;
+            void doStep() override;
     };
 }
 

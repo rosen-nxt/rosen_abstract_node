@@ -14,42 +14,42 @@
 
 namespace rosen_abstract_node
 {
-    sighandler_t old_handler = nullptr;
+    sighandler_t oldHandler = nullptr;
 
     void sighandler(const int param)
     {
         if(param == SIGINT)
         {
-            if(old_handler)
+            if(oldHandler)
             {
-                (*old_handler)(SIGINT);
+                (*oldHandler)(SIGINT);
             }
             exit(0);
         }
     }
 
-    void done_cb(const actionlib::SimpleClientGoalState& state,
+    void doneCb(const actionlib::SimpleClientGoalState& state,
                  const StateTransitionResultConstPtr& result)
     {
-        ROS_INFO("done_cb: server responded with state [%s]", state.toString().c_str());
+        ROS_INFO("doneCb: server responded with state [%s]", state.toString().c_str());
         ROS_INFO_STREAM("got result: "
-                        << to_string(node_state_no(result->new_state)));
+                        << toString(NodeStateNo(result->new_state)));
     }
 
     // Called once when the goal becomes active
-    void active_cb()
+    void activeCb()
     {
         ROS_INFO("Goal just went active");
     }
 
     // Called every time feedback is received for the goal
-    void feedback_cb(const StateTransitionFeedbackConstPtr& feedback)
+    void feedbackCb(const StateTransitionFeedbackConstPtr& feedback)
     {
-        ROS_INFO_STREAM("feedback_cb: current state: " << to_string(node_state_no(feedback->current_state))
-                        << " current transition: " << to_string(node_transition_no(feedback->transition)) );
+        ROS_INFO_STREAM("feedbackCb: current state: " << toString(NodeStateNo(feedback->current_state))
+                        << " current transition: " << toString(NodeTransitionNo(feedback->transition)) );
     }
 
-    void normal_mode(const std::string& topic)
+    void normalMode(const std::string& topic)
     {
         ROS_INFO("%s", topic.c_str());
         actionlib::SimpleActionClient<StateTransitionAction> ac(topic.c_str(), true);
@@ -63,16 +63,16 @@ namespace rosen_abstract_node
 
         bool exit = false;
         std::string input;
-        old_handler = signal(SIGINT, &sighandler);
+        oldHandler = signal(SIGINT, &sighandler);
 
         while (ros::ok() && !exit)
         {
             ros::spinOnce();
             for (int t = 0;
-                    is_valid(node_transition_no(t));
+                    isValid(NodeTransitionNo(t));
                     ++t)
             {
-                std::cout << to_string(node_transition_no(t)) << " : " << t << std::endl;
+                std::cout << toString(NodeTransitionNo(t)) << " : " << t << std::endl;
             }
             std::cout << "EXIT : -1 or [CTRL+D] or [CTRL+C]" << std::endl;
 
@@ -105,11 +105,11 @@ namespace rosen_abstract_node
                 continue;
             }
 
-            if (is_valid(node_transition_no(trans)))
+            if (isValid(NodeTransitionNo(trans)))
             {
                 goal.transition = trans;
-                std::cout << "Sending : " << to_string(node_transition_no(trans)) << std::endl << std::endl;
-                ac.sendGoal(goal, &done_cb, &active_cb, &feedback_cb);
+                std::cout << "Sending : " << toString(NodeTransitionNo(trans)) << std::endl << std::endl;
+                ac.sendGoal(goal, &doneCb, &activeCb, &feedbackCb);
             }
             else
             {
@@ -119,49 +119,49 @@ namespace rosen_abstract_node
     }
 
 
-    using menu_ptr = std::unique_ptr<MENU, decltype(&free_menu)>;
-    using item_ptr = std::unique_ptr<ITEM, decltype(&free_item)>;
+    using MenuPtr = std::unique_ptr<MENU, decltype(&free_menu)>;
+    using ItemPtr = std::unique_ptr<ITEM, decltype(&free_item)>;
 
 
-    class menu
+    class Menu
     {
         public:
-            menu(const std::vector<std::string>& node_names) :
-            nodes(node_names),
-            items(create_items(nodes)),
-            managed_items(create_managed_items(items)),
-            me(menu_ptr(new_menu(managed_items.data()), free_menu))
+            Menu(const std::vector<std::string>& nodeNames) :
+            nodes(nodeNames),
+            items(createItems(nodes)),
+            managedItems(createManagedItems(items)),
+            me(MenuPtr(new_menu(managedItems.data()), free_menu))
             {
             }
 
-            ~menu()
+            ~Menu()
             {
-                unpost_menu();
+                unpostMenu();
             }
 
-            void post_menu()
+            void postMenu()
             {
                 ::post_menu(me.get());
             }
 
-            void unpost_menu()
+            void unpostMenu()
             {
                 ::unpost_menu(me.get());
             }
 
-            void menu_driver(const int task)
+            void menuDriver(const int task)
             {
                 ::menu_driver(me.get(), task);
             }
 
-            int get_item_index()
+            int getItemIndex()
             {
                 return item_index(current_item(me.get()));
             }
 
             std::string select()
             {
-                post_menu();
+                postMenu();
                 refresh();
 
                 int ch;
@@ -171,18 +171,18 @@ namespace rosen_abstract_node
                     switch(ch)
                     {
                         case KEY_DOWN:
-                            menu_driver(REQ_DOWN_ITEM);
+                            menuDriver(REQ_DOWN_ITEM);
                             break;
                         case KEY_UP:
-                            menu_driver(REQ_UP_ITEM);
+                            menuDriver(REQ_UP_ITEM);
                             break;
                         case 0xA:    // RETURN key
-                            if( static_cast<unsigned int>( get_item_index()) == nodes.size())
+                            if( static_cast<unsigned int>( getItemIndex()) == nodes.size())
                             {
                                 exit(0);
                             }
 
-                            int index = get_item_index();
+                            int index = getItemIndex();
                             return nodes.at(index).append("/state_transition_action");
                     }
                 }
@@ -192,45 +192,45 @@ namespace rosen_abstract_node
 
         private:
             std::vector<std::string> nodes;
-            std::vector<item_ptr> items;
+            std::vector<ItemPtr> items;
             // The lifetime of the raw pointers are managed by the the smart pointers from items.
-            std::vector<ITEM*> managed_items;
-            menu_ptr me;
+            std::vector<ITEM*> managedItems;
+            MenuPtr me;
 
-            std::vector<item_ptr> create_items(const std::vector<std::string>& nodes)
+            std::vector<ItemPtr> createItems(const std::vector<std::string>& nodes)
             {
-                std::vector<item_ptr> items;
+                std::vector<ItemPtr> items;
 
                 for(auto & node : nodes)
                 {
-                    items.push_back(item_ptr(new_item(node.c_str(), ""), free_item));
+                    items.push_back(ItemPtr(new_item(node.c_str(), ""), free_item));
                 }
-                items.push_back(item_ptr(new_item("(q)uit", ""), free_item));
-                items.push_back(item_ptr(nullptr, free_item));
+                items.push_back(ItemPtr(new_item("(q)uit", ""), free_item));
+                items.push_back(ItemPtr(nullptr, free_item));
 
                 return items;
             }
 
-            std::vector<ITEM*> create_managed_items(const std::vector<item_ptr>& items)
+            std::vector<ITEM*> createManagedItems(const std::vector<ItemPtr>& items)
             {
-                std::vector<ITEM*> managed_items;
+                std::vector<ITEM*> managedItems;
                 for(auto & item : items)
                 {
-                    managed_items.push_back(item.get());
+                    managedItems.push_back(item.get());
                 }
-                return managed_items;
+                return managedItems;
             }
 
     };
 
 
-    class window
+    class Window
     {
         public:
-            window()
+            Window()
             {
                 initscr();
-                old_handler = signal(SIGINT, &sighandler);
+                oldHandler = signal(SIGINT, &sighandler);
                 clear();
                 noecho();
                 curs_set(0);
@@ -240,27 +240,27 @@ namespace rosen_abstract_node
                 clear();
             }
 
-            ~window()
+            ~Window()
             {
                 endwin();
-                old_handler = 0;
+                oldHandler = 0;
             }
 
-            std::string select_from_menu()
+            std::string selectFromMenu()
             {
-                auto nodes = get_nodes();
-                rosen_abstract_node::menu me(nodes);
+                auto nodes = getNodes();
+                rosen_abstract_node::Menu me(nodes);
                 return me.select();
             }
         
         private:
             std::vector<std::string> nodes;
 
-            std::vector<std::string> get_nodes()
+            std::vector<std::string> getNodes()
             {
                 nodes.clear();
                 ros::NodeHandle nh;
-                ros::Subscriber diag_subscriber = nh.subscribe("/diagnostics", 100, &window::diag_callback, this);
+                ros::Subscriber diagSubscriber = nh.subscribe("/diagnostics", 100, &Window::diagCallback, this);
                 const int steps = 20;
                 std::cout << std::endl;
                 mvaddstr(1, 1, "Searching nodes");
@@ -292,7 +292,7 @@ namespace rosen_abstract_node
                 return nodes;
             }
 
-            void diag_callback(const ros::MessageEvent<const diagnostic_msgs::DiagnosticArray>& event)
+            void diagCallback(const ros::MessageEvent<const diagnostic_msgs::DiagnosticArray>& event)
             {
                 const std::string& identifier = event.getPublisherName();
                 if(std::find(nodes.begin(), nodes.end(), identifier) == nodes.end())
@@ -307,12 +307,12 @@ namespace rosen_abstract_node
             }
     };
 
-    std::string select_node(int argc, char **argv)
+    std::string selectNode(int argc, char **argv)
     {
         if(argc == 2 && strncmp(argv[1], "-a", 2) == 0)
         {
-                window win;
-                return win.select_from_menu();
+                Window win;
+                return win.selectFromMenu();
         }
 
         std::string target;
@@ -334,8 +334,8 @@ namespace rosen_abstract_node
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "actionTest", ros::InitOption::AnonymousName);
-    rosen_abstract_node::old_handler = signal(SIGINT, &rosen_abstract_node::sighandler);
+    rosen_abstract_node::oldHandler = signal(SIGINT, &rosen_abstract_node::sighandler);
 
-    auto target = rosen_abstract_node::select_node(argc, argv);
-    rosen_abstract_node::normal_mode(target);
+    auto target = rosen_abstract_node::selectNode(argc, argv);
+    rosen_abstract_node::normalMode(target);
 }
