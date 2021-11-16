@@ -9,7 +9,7 @@
         <param name="test_duration" value="10.0" />
     </test>
 
-    <test test-name="$(arg testprefix)_diagnostic_messages_with_correct_hardware_id_published" pkg="rosen_abstract_node" type="DiagnosticsRostest">
+    <test test-name="$(arg testprefix)_diagnostic_messages_with_correct_hardware_id_published" pkg="rosen_abstract_node" type="diagnostics_rostest">
         <param name="test_filter" value="diagnosticMessagesWithCorrectHardwareIdPublished" />
         <param name="full_qualified_node_name" value="$(arg full_qualified_node_name)" />
     </test>

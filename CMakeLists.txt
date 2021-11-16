@@ -184,17 +184,17 @@ if(CATKIN_ENABLE_TESTING)
   ## Add ROSTEST executables ##
   #############################
 
-  file(GLOB rostest_cpps "rostest/*.cpp")
-  foreach(rostest_cpp ${rostest_cpps})
-      get_filename_component(rostest_cpp_name ${rostest_cpp} NAME_WE)
+  add_executable(diagnostics_rostest
+    rostest/DiagnosticsRostest.cpp
+  )
+  add_dependencies(diagnostics_rostest ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(diagnostics_rostest ${catkin_LIBRARIES} ${PACKAGE_CONFIGURATION_EXPORTED_LIBRARIES} rosen_abstract_node ${GTEST_LIBRARIES} pthread)
 
-      add_executable(${rostest_cpp_name}
-          ${rostest_cpp}
-      )
-
-      add_dependencies(${rostest_cpp_name} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-      target_link_libraries(${rostest_cpp_name} ${catkin_LIBRARIES} ${PACKAGE_CONFIGURATION_EXPORTED_LIBRARIES} rosen_abstract_node ${GTEST_LIBRARIES} pthread)
-  endforeach()
+  add_executable(transitions_rostest
+    rostest/TransitionsRostest.cpp
+  )
+  add_dependencies(transitions_rostest ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(transitions_rostest ${catkin_LIBRARIES} ${PACKAGE_CONFIGURATION_EXPORTED_LIBRARIES} rosen_abstract_node ${GTEST_LIBRARIES} pthread)
 
   #######################
   ## Add ROSTEST tests ##
