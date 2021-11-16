@@ -107,7 +107,7 @@ namespace rosen_abstract_node
              * 
              * @return The current state the node is in.
              */
-            node_state_no get_current_state() const;
+            unsigned int get_current_state() const;
 
             /**
              * @brief Returns the configured flags.

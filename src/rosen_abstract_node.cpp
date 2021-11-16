@@ -151,7 +151,7 @@ namespace rosen_abstract_node
         return transition_successful;
     }
 
-    node_state_no rosen_abstract_node::get_current_state() const
+    unsigned int rosen_abstract_node::get_current_state() const
     {
         return sm.get_current_state();
     }
