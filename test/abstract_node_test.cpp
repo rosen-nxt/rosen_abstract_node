@@ -15,7 +15,7 @@ namespace node_test
     {
         public:
             mock_abstract_node() :
-                rosen_abstract_node(std::string("node_name"), nullptr, nullptr) {}
+                rosen_abstract_node(std::string("node_name"), nullptr, nullptr, 42) {}
             virtual ~mock_abstract_node() = default;
 
             void do_loop_once()
@@ -35,6 +35,13 @@ namespace node_test
             
             MOCK_METHOD0(do_step, void());
     };
+}
+
+TEST(abstract_node_test, flags_have_been_set)
+{
+    StrictMock<node_test::mock_abstract_node> node;
+
+    ASSERT_EQ(node.get_flags(), 42);
 }
 
 TEST(abstract_node_test, do_functions_are_called_in_the_loop)

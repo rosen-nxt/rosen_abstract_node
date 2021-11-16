@@ -1,0 +1,11 @@
+<launch>
+    <arg name="test_prefix" value="dummy_node" />
+    <arg name="node_name" value="test_python_dummy_node" />
+
+    <include file="$(find rosen_abstract_node)/rostest/flags_published.xml">
+        <arg name="test_prefix" value="$(arg test_prefix)" />
+        <arg name="node_name" value="$(arg node_name)" />
+    </include>
+    
+    <node name="$(arg node_name)" pkg="rosen_abstract_node" type="python_dummy_node.py" />
+</launch>

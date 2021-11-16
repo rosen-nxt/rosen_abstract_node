@@ -35,14 +35,28 @@ namespace rosen_abstract_node
         public:
 
             /**
+             * @brief Initialises the abstract node with default node name and namespace. Only the flags are required.
+             *
+             * @param flags  Additional node control parameter. They can be used by other nodes to
+             *               control this node in a certain way. The concrete definition of these parameters
+             *               is not part of the abstract_node.
+             */
+            explicit rosen_abstract_node(const unsigned char flags);
+
+            /**
              * @brief Initialises the abstract node with all required ROS components with the
              *        given node name in the given namespaces.
              *        Use this constructor if you want a default initialisation of all required ROS components.
              * 
              * @param node_name       The name of the ROS node.
              * @param node_namespace  The private namespace of the ROS node.
+             * @param flags           Additional node control parameter. They can be used by other nodes to
+             *                        control this node in a certain way. The concrete definition of these parameters
+             *                        is not part of the abstract_node.
              */
-            explicit rosen_abstract_node(const std::string& node_name = ros::this_node::getName(), const std::string& node_namespace = "~");
+            explicit rosen_abstract_node(const std::string& node_name = ros::this_node::getName(),
+                                         const std::string& node_namespace = "~",
+                                         const unsigned char flags = 0);
 
             /**
              * @brief Initialises the abstract node with the passed node_handle and diagnostics
@@ -53,10 +67,14 @@ namespace rosen_abstract_node
              * @param node_name               The name of the ROS node.
              * @param ros_node_handle_private The private node handle to be used.
              * @param ros_diagnostic_updater  The diagnostic updater to be used for diagnostic purposes.
+             * @param flags                   Additional node control parameter. They can be used by other nodes to
+             *                                control this node in a certain way. The concrete definition of these
+             *                                parameters is not part of the abstract_node.
              */
             rosen_abstract_node(const std::string& node_name,
                                 const std::shared_ptr<ros::NodeHandle>& ros_node_handle_private,
-                                const std::shared_ptr<diagnostic_updater::Updater>& ros_diagnostic_updater);
+                                const std::shared_ptr<diagnostic_updater::Updater>& ros_diagnostic_updater,
+                                const unsigned char flags = 0);
 
             virtual ~rosen_abstract_node() = default;
 
@@ -82,7 +100,16 @@ namespace rosen_abstract_node
              */
             node_state_no get_current_state() const;
 
+            /**
+             * @brief Returns the configured flags.
+             *
+             * @return The flags.
+             */
+            unsigned char get_flags() const;
+
         private:
+
+            unsigned char flags;
 
             /**
              * @brief Callback used when initiating a transition via the state_transition_action.
@@ -116,7 +143,14 @@ namespace rosen_abstract_node
 
             std::vector<ros::Publisher> wrapped_publishers;
 
+            std::shared_ptr<ros::Publisher> flags_publisher;
+
             double loop_frequency;
+
+            /**
+             * @brief Publish the flags as ROS message.
+             */
+            void publish_flags() const;
 
         protected:
 

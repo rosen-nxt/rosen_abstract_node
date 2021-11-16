@@ -1,0 +1,14 @@
+<launch>
+    <arg name="test_prefix" />
+    <arg name="node_name" />
+
+    <test test-name="$(arg test_prefix)_flags_published" pkg="rostest" type="publishtest">
+        <rosparam subst_value="True">
+          topics:
+            - name: /$(arg node_name)/flags
+              timeout: 5
+              negative: False
+        </rosparam>
+    </test>
+
+</launch>

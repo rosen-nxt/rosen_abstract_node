@@ -4,6 +4,7 @@ from threading import Condition
 import actionlib
 import diagnostic_updater
 import rospy
+from std_msgs.msg import UInt8
 
 from rosen_abstract_node.node_transition_helper import NodeTransitionHelper
 from rosen_abstract_node.abstract_node_sm import AbstractNodeSM
@@ -12,7 +13,7 @@ from rosen_abstract_node.msg import NodeStateInfo, NodeTransition, StateTransiti
 class RosenAbstractNode(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, node_name = None):
+    def __init__(self, node_name=None, flags=0):
         """ Initialises the abstract node with all required ROS components with the
         given node name in the given namespaces.
         Use this constructor if you want a default initialisation of all required ROS components.
@@ -21,8 +22,12 @@ class RosenAbstractNode(object):
         ----------
         node_name : str
             The name of the ROS node. When passing None, name is inherited from ROS configuration.
+        flags: int
+            Additional node control parameter. They can be used by other nodes to control this node
+            in a certain way. The concrete definition of these parameters is not part of the abstract_node.
         """    
         self.ros_node_name = rospy.get_name() if node_name == None else node_name
+        self.flags = flags
         self.next_trans = NodeTransition.NONE
         self.transition_successful = False
         self.transition_processed = False
@@ -44,6 +49,9 @@ class RosenAbstractNode(object):
         self.state_transition_action_server.start()
         self.diag_updater = diagnostic_updater.Updater()
         self.diag_updater.setHardwareID(self.ros_node_name)
+
+        self.flags_publisher = rospy.Publisher('~flags', UInt8, queue_size=1, latch=True)
+        self.publish_flags()
 
     def sm_action_cb(self, goal):
         """ Callback used when initiating a transition via the state_transition_action.
@@ -146,6 +154,9 @@ class RosenAbstractNode(object):
         """
         return self.sm.get_current_state()
 
+    def get_flags(self):
+        return self.flags
+
     def loop(self):
         """ The main, blocking loop of the node. Should be called after initialising the object.
         Runs forever.
@@ -203,6 +214,11 @@ class RosenAbstractNode(object):
             publishes the new current state"""
         self.do_transition(sequence_count,node_state_info_publisher)
         self.do_step()
+
+    def publish_flags(self):
+        flags_msg = UInt8()
+        flags_msg.data = self.flags
+        self.flags_publisher.publish(flags_msg)
 
     @abstractmethod
     def do_init(self):

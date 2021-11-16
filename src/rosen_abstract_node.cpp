@@ -3,6 +3,7 @@
 #include <boost/bind.hpp>
 #include <stdexcept>
 #include <ros/ros.h>
+#include <std_msgs/UInt8.h>
 #include <diagnostic_updater/publisher.h>
 #include <diagnostic_updater/update_functions.h>
 
@@ -17,18 +18,25 @@ namespace rosen_abstract_node
         const ros::Duration CURRENT_STATE_FREQUENCY = ros::Duration(1.0);
     }
 
-    rosen_abstract_node::rosen_abstract_node(const std::string& node_name, const std::string& node_namespace)
-    : rosen_abstract_node(node_name, std::make_shared<ros::NodeHandle>(node_namespace), std::make_shared<diagnostic_updater::Updater>())
+    rosen_abstract_node::rosen_abstract_node(const unsigned char flags)
+    : rosen_abstract_node(ros::this_node::getName(), "~", flags)
+    {}
+
+    rosen_abstract_node::rosen_abstract_node(const std::string& node_name, const std::string& node_namespace, const unsigned char flags)
+    : rosen_abstract_node(node_name, std::make_shared<ros::NodeHandle>(node_namespace), std::make_shared<diagnostic_updater::Updater>(), flags)
     {}
 
     rosen_abstract_node::rosen_abstract_node(const std::string& node_name,
                                              const std::shared_ptr<ros::NodeHandle>& ros_node_handle_private,
-                                             const std::shared_ptr<diagnostic_updater::Updater>& ros_diagnostic_updater)
-    : ros_node_name(node_name),
+                                             const std::shared_ptr<diagnostic_updater::Updater>& ros_diagnostic_updater,
+                                             const unsigned char flags)
+    : flags(flags),
+      ros_node_name(node_name),
       next_trans(NodeTransition::NONE),
       state_transition_action_server(nullptr),
       diag_updater(ros_diagnostic_updater),
       wrapped_publishers(),
+      flags_publisher(nullptr),
       loop_frequency(DEFAULT_LOOP_FREQUENCY),
       sm(std::bind(&rosen_abstract_node::do_init, this),
          std::bind(&rosen_abstract_node::do_connect, this),
@@ -47,6 +55,9 @@ namespace rosen_abstract_node
               [&](const StateTransitionGoalConstPtr& goal) { this->sm_action_cb(goal); },
               false);
             state_transition_action_server->start();
+
+            flags_publisher = std::make_shared<ros::Publisher>(node_handle_private->advertise<std_msgs::UInt8>("flags", 1, true));
+            publish_flags();
         }
         if (diag_updater != nullptr)
         {
@@ -201,4 +212,15 @@ namespace rosen_abstract_node
         return loop_frequency;
     }
 
+    unsigned char rosen_abstract_node::get_flags() const
+    {
+        return flags;
+    }
+
+    void rosen_abstract_node::publish_flags() const
+    {
+        std_msgs::UInt8 flags_msg;
+        flags_msg.data = flags;
+        flags_publisher->publish(flags_msg);
+    }
 }
