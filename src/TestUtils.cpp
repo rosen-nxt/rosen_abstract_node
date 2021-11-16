@@ -14,12 +14,12 @@ namespace rosen_abstract_node
     {
         bool doNodeTransition(ros::NodeHandle& nh, const std::string& nodeName, const uint8_t nodeTransition)
         {
-            actionlib::SimpleActionClient<rosen_abstract_node::StateTransitionAction> action_client(nh, nodeName + "/state_transition_action", true);
-            action_client.waitForServer();
+            actionlib::SimpleActionClient<rosen_abstract_node::StateTransitionAction> actionClient(nh, nodeName + "/state_transition_action", true);
+            actionClient.waitForServer();
 
             rosen_abstract_node::StateTransitionGoal goal;
             goal.transition = nodeTransition;
-            return action_client.sendGoalAndWait(goal) == actionlib::SimpleClientGoalState::SUCCEEDED;
+            return actionClient.sendGoalAndWait(goal) == actionlib::SimpleClientGoalState::SUCCEEDED;
         }
 
         bool setNodeToRunning(ros::NodeHandle& nh, const std::string& nodeName)
@@ -32,8 +32,8 @@ namespace rosen_abstract_node
 
         bool waitForNodeInState(ros::NodeHandle& nh, const std::string& nodeName, const uint8_t expectedState, const ros::Duration& timeout)
         {
-            auto timeout_time = ros::Time::now() + timeout;
-            while (ros::Time::now() < timeout_time)
+            auto timeoutTime = ros::Time::now() + timeout;
+            while (ros::Time::now() < timeoutTime)
             {
                 auto nodeStateInfo = ros::topic::waitForMessage<rosen_abstract_node::NodeStateInfo>(nodeName + "/current_state", nh, timeout);
                 if (nodeStateInfo == nullptr)
