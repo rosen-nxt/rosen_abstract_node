@@ -1,14 +1,23 @@
-from rosen_abstract_node.msg import NodeState
+from enum import IntFlag
+
+
+class NodeStateNo(IntFlag):
+    STOPPED = 1
+    NODE_CONFIGURED = 2
+    COMPONENT_CONNECTED = 3
+    COMPONENT_RUNNING = 4
+    COMPONENT_PAUSED = 5
+    COMPONENT_DISCONNECTED = 6
+
 
 class NodeStateHelper(object):
-
     valid_states = {
-        NodeState.STOPPED : "STOPPED",
-        NodeState.NODE_CONFIGURED : "NODE_CONFIGURED",
-        NodeState.COMPONENT_CONNECTED : "COMPONENT_CONNECTED",
-        NodeState.COMPONENT_RUNNING : "COMPONENT_RUNNING",
-        NodeState.COMPONENT_PAUSED : "COMPONENT_PAUSED",
-        NodeState.COMPONENT_DISCONNECTED : "COMPONENT_DISCONNECTED"
+        NodeStateNo.STOPPED : "STOPPED",
+        NodeStateNo.NODE_CONFIGURED : "NODE_CONFIGURED",
+        NodeStateNo.COMPONENT_CONNECTED : "COMPONENT_CONNECTED",
+        NodeStateNo.COMPONENT_RUNNING : "COMPONENT_RUNNING",
+        NodeStateNo.COMPONENT_PAUSED : "COMPONENT_PAUSED",
+        NodeStateNo.COMPONENT_DISCONNECTED : "COMPONENT_DISCONNECTED"
     }
 
     @classmethod

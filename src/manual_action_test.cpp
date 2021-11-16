@@ -33,7 +33,7 @@ namespace rosen_abstract_node
     {
         ROS_INFO("done_cb: server responded with state [%s]", state.toString().c_str());
         ROS_INFO_STREAM("got result: "
-                        << node_state_helper::to_string(result->new_state));
+                        << to_string(node_state_no(result->new_state)));
     }
 
     // Called once when the goal becomes active
@@ -45,8 +45,8 @@ namespace rosen_abstract_node
     // Called every time feedback is received for the goal
     void feedback_cb(const StateTransitionFeedbackConstPtr& feedback)
     {
-        ROS_INFO_STREAM("feedback_cb: current state: " << node_state_helper::to_string(feedback->current_state)
-                        << " current transition: " << node_transition_helper::to_string(feedback->transition) );
+        ROS_INFO_STREAM("feedback_cb: current state: " << to_string(node_state_no(feedback->current_state))
+                        << " current transition: " << to_string(node_transition_no(feedback->transition)) );
     }
 
     void normal_mode(const std::string& topic)
@@ -69,10 +69,10 @@ namespace rosen_abstract_node
         {
             ros::spinOnce();
             for (int t = 0;
-                    node_transition_helper::is_valid(t);
+                    is_valid(node_transition_no(t));
                     ++t)
             {
-                std::cout << node_transition_helper::to_string(t) << " : " << t << std::endl;
+                std::cout << to_string(node_transition_no(t)) << " : " << t << std::endl;
             }
             std::cout << "EXIT : -1 or [CTRL+D] or [CTRL+C]" << std::endl;
 
@@ -105,10 +105,10 @@ namespace rosen_abstract_node
                 continue;
             }
 
-            if (node_transition_helper::is_valid(trans))
+            if (is_valid(node_transition_no(trans)))
             {
                 goal.transition = trans;
-                std::cout << "Sending : " << node_transition_helper::to_string(trans) << std::endl << std::endl;
+                std::cout << "Sending : " << to_string(node_transition_no(trans)) << std::endl << std::endl;
                 ac.sendGoal(goal, &done_cb, &active_cb, &feedback_cb);
             }
             else

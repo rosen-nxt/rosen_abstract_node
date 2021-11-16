@@ -1,16 +1,27 @@
-from rosen_abstract_node.msg import NodeTransition
+from enum import IntFlag
+
+
+class NodeTransitionNo(IntFlag):
+    NONE = 0
+    INIT = 1
+    CONNECT = 2
+    DISCONNECT = 3
+    START = 4
+    PAUSE = 5
+    RESUME = 6
+    STOP = 7
+
 
 class NodeTransitionHelper(object):
-
     valid_transitions = {
-        NodeTransition.NONE : "NONE",
-        NodeTransition.INIT : "INIT",
-        NodeTransition.CONNECT : "CONNECT",
-        NodeTransition.DISCONNECT : "DISCONNECT",
-        NodeTransition.START : "START",
-        NodeTransition.PAUSE : "PAUSE",
-        NodeTransition.RESUME : "RESUME",
-        NodeTransition.STOP : "STOP"
+        NodeTransitionNo.NONE : "NONE",
+        NodeTransitionNo.INIT : "INIT",
+        NodeTransitionNo.CONNECT : "CONNECT",
+        NodeTransitionNo.DISCONNECT : "DISCONNECT",
+        NodeTransitionNo.START : "START",
+        NodeTransitionNo.PAUSE : "PAUSE",
+        NodeTransitionNo.RESUME : "RESUME",
+        NodeTransitionNo.STOP : "STOP"
     }
 
     @classmethod

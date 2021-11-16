@@ -2,6 +2,7 @@
 #define ROSEN_ABSTRACT_NODE_STATE_MACHINE_H
 
 #include <functional>
+#include <vector>
 
 #include "rosen_abstract_node/node_state_helper.h"
 #include "rosen_abstract_node/node_transition_helper.h"

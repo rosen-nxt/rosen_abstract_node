@@ -89,9 +89,18 @@ namespace rosen_abstract_node
              *        If multiple transitions get passed before the loop executed one of them, 
              *        only the last one gets executed.
              * 
-             * @param transition The transition (msg::NodeTransition) to be executed.
+             * @param transition The transition to be executed.
              */
             void initiate_transition(node_transition_no transition);
+
+            /**
+             * @brief Initiate the given transition to be executed by the node in the next loop.
+             *        If multiple transitions get passed before the loop executed one of them,
+             *        only the last one gets executed.
+             *
+             * @param transition The transition to be executed.
+             */
+            void initiate_transition(unsigned char transition);
 
             /**
              * @brief Gets the current state the node is in.

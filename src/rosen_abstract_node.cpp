@@ -7,7 +7,6 @@
 #include <diagnostic_updater/publisher.h>
 #include <diagnostic_updater/update_functions.h>
 
-#include "rosen_abstract_node/NodeTransition.h"
 #include "rosen_abstract_node/NodeState.h"
 
 namespace rosen_abstract_node
@@ -32,7 +31,7 @@ namespace rosen_abstract_node
                                              const unsigned char flags)
     : flags(flags),
       ros_node_name(node_name),
-      next_trans(NodeTransition::NONE),
+      next_trans(node_transition_no::NONE),
       state_transition_action_server(nullptr),
       diag_updater(ros_diagnostic_updater),
       wrapped_publishers(),
@@ -69,10 +68,10 @@ namespace rosen_abstract_node
     {
         transition_processed = false;
 
-        const node_transition_no trans = goal->transition;
-        if (node_transition_helper::is_valid(trans) && trans != NodeTransition::NONE)
+        const node_transition_no trans = node_transition_no(goal->transition);
+        if (is_valid(trans) && trans != node_transition_no::NONE)
         {
-            ROS_INFO_STREAM("abstract_node::sm_action_cb transition: " << node_transition_helper::to_string(trans));
+            ROS_INFO_STREAM("abstract_node::sm_action_cb transition: " << to_string(trans));
 
             StateTransitionFeedback state_transition_feedback;
             state_transition_feedback.current_state = sm.get_current_state();
@@ -107,9 +106,14 @@ namespace rosen_abstract_node
         next_trans = transition;
     }
 
+    void rosen_abstract_node::initiate_transition(unsigned char transition)
+    {
+        initiate_transition(node_transition_no(transition));
+    }
+
     void rosen_abstract_node::do_transition(const std::unique_ptr<ros::Publisher>& current_state_publisher)
     {
-        if (next_trans == NodeTransition::NONE)
+        if (next_trans == node_transition_no::NONE)
         {
             return;
         }
@@ -136,7 +140,7 @@ namespace rosen_abstract_node
                 rosen_abstract_node::update_and_publish_node_state_info(*current_state_publisher, now, node_state_info);
             }
             transition_processed = true;
-            next_trans = NodeTransition::NONE;
+            next_trans = node_transition_no::NONE;
         }
 
         transition_condition_variable.notify_one();

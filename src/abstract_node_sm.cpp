@@ -11,14 +11,14 @@ namespace rosen_abstract_node
                                        std::function<bool()> do_pause,
                                        std::function<bool()> do_resume,
                                        std::function<bool()> do_stop)
-    : sm(NodeState::STOPPED),
+    : sm(node_state_no::STOPPED),
       do_callbacks{
-        {NodeTransition::INIT, do_init},
-        {NodeTransition::CONNECT, do_connect},
-        {NodeTransition::DISCONNECT, do_disconnect},
-        {NodeTransition::PAUSE, do_pause},
-        {NodeTransition::RESUME, do_resume},
-        {NodeTransition::STOP, do_stop},
+        {node_transition_no::INIT, do_init},
+        {node_transition_no::CONNECT, do_connect},
+        {node_transition_no::DISCONNECT, do_disconnect},
+        {node_transition_no::PAUSE, do_pause},
+        {node_transition_no::RESUME, do_resume},
+        {node_transition_no::STOP, do_stop},
                    },
       do_start(do_start)
     {
@@ -27,40 +27,40 @@ namespace rosen_abstract_node
 
     void abstract_node_sm::init_sm()
     {
-        sm.add_transition(NodeTransition::INIT,
-                          {NodeState::STOPPED},
-                          NodeState::NODE_CONFIGURED,
-                          do_callbacks.at(NodeTransition::INIT));
-        sm.add_transition(NodeTransition::CONNECT,
-                          {NodeState::NODE_CONFIGURED, NodeState::COMPONENT_DISCONNECTED},
-                          NodeState::COMPONENT_CONNECTED,
-                          do_callbacks.at(NodeTransition::CONNECT));
-        sm.add_transition(NodeTransition::DISCONNECT,
-                          {NodeState::COMPONENT_PAUSED, NodeState::COMPONENT_RUNNING, NodeState::COMPONENT_CONNECTED},
-                          NodeState::COMPONENT_DISCONNECTED,
-                          do_callbacks.at(NodeTransition::DISCONNECT));
-        sm.add_transition(NodeTransition::PAUSE,
-                          {NodeState::COMPONENT_RUNNING},
-                          NodeState::COMPONENT_PAUSED,
-                          do_callbacks.at(NodeTransition::PAUSE));
-        sm.add_transition(NodeTransition::RESUME,
-                          {NodeState::COMPONENT_PAUSED},
-                          NodeState::COMPONENT_RUNNING,
-                          do_callbacks.at(NodeTransition::RESUME));
-        sm.add_transition(NodeTransition::STOP,
-                          {NodeState::NODE_CONFIGURED, NodeState::COMPONENT_DISCONNECTED},
-                          NodeState::STOPPED,
-                          do_callbacks.at(NodeTransition::STOP));
+        sm.add_transition(node_transition_no::INIT,
+                          {node_state_no::STOPPED},
+                          node_state_no::NODE_CONFIGURED,
+                          do_callbacks.at(node_transition_no::INIT));
+        sm.add_transition(node_transition_no::CONNECT,
+                          {node_state_no::NODE_CONFIGURED, node_state_no::COMPONENT_DISCONNECTED},
+                          node_state_no::COMPONENT_CONNECTED,
+                          do_callbacks.at(node_transition_no::CONNECT));
+        sm.add_transition(node_transition_no::DISCONNECT,
+                          {node_state_no::COMPONENT_PAUSED, node_state_no::COMPONENT_RUNNING, node_state_no::COMPONENT_CONNECTED},
+                          node_state_no::COMPONENT_DISCONNECTED,
+                          do_callbacks.at(node_transition_no::DISCONNECT));
+        sm.add_transition(node_transition_no::PAUSE,
+                          {node_state_no::COMPONENT_RUNNING},
+                          node_state_no::COMPONENT_PAUSED,
+                          do_callbacks.at(node_transition_no::PAUSE));
+        sm.add_transition(node_transition_no::RESUME,
+                          {node_state_no::COMPONENT_PAUSED},
+                          node_state_no::COMPONENT_RUNNING,
+                          do_callbacks.at(node_transition_no::RESUME));
+        sm.add_transition(node_transition_no::STOP,
+                          {node_state_no::NODE_CONFIGURED, node_state_no::COMPONENT_DISCONNECTED},
+                          node_state_no::STOPPED,
+                          do_callbacks.at(node_transition_no::STOP));
     }
 
     bool abstract_node_sm::sm_start()
     {
-        if (sm.get_current_state() == NodeState::COMPONENT_CONNECTED)
+        if (sm.get_current_state() == node_state_no::COMPONENT_CONNECTED)
         {
             bool running = false;
             if (do_start(running))
             {
-                sm.set_current_state(running ?    NodeState::COMPONENT_RUNNING : NodeState::COMPONENT_PAUSED);
+                sm.set_current_state(running ?    node_state_no::COMPONENT_RUNNING : node_state_no::COMPONENT_PAUSED);
                 return true;
             }
         }
@@ -77,7 +77,7 @@ namespace rosen_abstract_node
         // The start transition is an edge case, because it can result in different states, running or paused,
         // which depends on running parameter. So the start transition cannot be added to the state machine
         // and has to be implemented outside of it.
-        if (next_trans == NodeTransition::START)
+        if (next_trans == node_transition_no::START)
         {
             return sm_start();
         }
