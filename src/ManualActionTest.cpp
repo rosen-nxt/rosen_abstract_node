@@ -297,11 +297,14 @@ namespace rosen_abstract_node
                 const std::string& identifier = event.getPublisherName();
                 if(std::find(nodes.begin(), nodes.end(), identifier) == nodes.end())
                 {
-                    if(event.getConstMessage()->status[0].name.find(": Frequency Status") != std::string::npos)
+                    if(!event.getConstMessage()->status.empty())
                     {
-                        nodes.push_back(identifier);
-                        mvaddch(1, 25 + nodes.size(), '.');
-                        refresh();
+                        if(event.getConstMessage()->status[0].name.find(": Frequency Status") != std::string::npos)
+                        {
+                            nodes.push_back(identifier);
+                            mvaddch(1, 25 + nodes.size(), '.');
+                            refresh();
+                        }
                     }
                 }
             }
